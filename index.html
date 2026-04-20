@@ -34,26 +34,14 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion-based control can produce high-quality and multi-modal action
-      trajectories, but iterative denoising incurs substantial inference
-      latency that limits real-time deployment. We introduce
-      <em>Factorized Koopman Distillation (FKD)</em>, a dynamic one-step student
-      that distills a multi-step diffusion teacher into a Koopman-structured
-      latent dynamics module and a lightweight action head.
-    </p>
-    <p>
-      On D4RL MuJoCo locomotion benchmarks, FKD matches or exceeds teacher-level
-      normalized return while reducing decision latency from the
-      ~100–300 ms regime to the ~1 ms regime. The distilled policy also
-      preserves teacher-side multimodal structure, whereas prior one-step
-      Koopman baselines (KDM/KDM-F) exhibit mode collapse and unstable rollouts.
-    </p>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Student inference is one-step at
-      deployment with optional refinement steps
-      <span class="math">\(J\)</span>; candidate selection uses IQL ranking
-      with argmax policy extraction in the reported setting.
-    </div>
+      Diffusion models excel at generating diverse, multimodal trajectories for robotic planning, yet their iterative denoising process introduces latencies that are incompatible with high-frequency closed-loop control. 
+      In this paper, we propose <em>Dynamic Neural Koopman Distillation</em>, a framework that distills multistep diffusion inference into a single forward pass while retaining the teacher model's multimodal expressivity. Specifically, 
+      we reformulate the denoising process as a state-dependent factorized latent transition regularized by spectral and inverse-consistency constraints. To realize this formulation, we introduce a Factorized Dynamic Koopman layer 
+      that replaces a fixed global operator with a state-dependent factorized linear map whose latent modal gains depend on the current latent state. 
+      We evaluate the proposed method on standard D4RL MuJoCo locomotion benchmarks and a physical Kinova manipulator, comparing against consistency-based one-step baselines and static Koopman distillation baselines. 
+      Results show that the proposed approach achieves the highest normalized returns among the one-step baselines and attains teacher-level performance on the reported locomotion tasks. 
+      It also reduces inference latency to the millisecond regime, yielding substantial speedups over the teacher in the reported control settings. 
+    </p> 
   </div>
 </section>
 
@@ -196,8 +184,8 @@
     <div class="video-grid">
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_diffusion.mp4" type="video/mp4" /></video><figcaption>Diffusion Teacher (20-step).</figcaption></figure>
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>FKD (Ours, one-step).</strong></figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline (failure case).</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline (failure case).</figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline.</figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline.</figcaption></figure>
     </div>
     <div class="impl-details">
       <strong>Implementation details.</strong> The 2×2 layout is fixed as:
@@ -209,8 +197,8 @@
     <div class="video-grid">
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Diffusion Teacher (20-step).</figcaption></figure>
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>FKD (Ours, one-step).</strong></figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline (failure case).</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline (failure case).</figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline.</figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline.</figcaption></figure>
     </div>
 
     <h3>Online latency-aware replay (teacher vs student)</h3>
