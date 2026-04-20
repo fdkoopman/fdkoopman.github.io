@@ -34,17 +34,19 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion policies produce high-quality, multi-modal action trajectories,
-      but their iterative sampling makes them impractical for real-time control.
-      We propose <em>Factorized Koopman Distillation (FKD)</em>, which distills
-      a multi-step diffusion teacher into a one-step student through a
-      factorized Koopman latent transition and action prediction head.
+      Diffusion-based control can produce high-quality and multi-modal action
+      trajectories, but iterative denoising incurs substantial inference
+      latency that limits real-time deployment. We introduce
+      <em>Factorized Koopman Distillation (FKD)</em>, a dynamic one-step student
+      that distills a multi-step diffusion teacher into a Koopman-structured
+      latent dynamics module and a lightweight action head.
     </p>
     <p>
-      On D4RL MuJoCo locomotion, FKD preserves teacher-level performance while
-      reducing decision latency from ~100–300 ms to ~1 ms, and retains
-      multi-modal candidate structure that prior one-step Koopman variants
-      (KDM/KDM-F) fail to maintain.
+      On D4RL MuJoCo locomotion benchmarks, FKD matches or exceeds teacher-level
+      normalized return while reducing decision latency from the
+      ~100–300 ms regime to the ~1 ms regime. The distilled policy also
+      preserves teacher-side multimodal structure, whereas prior one-step
+      Koopman baselines (KDM/KDM-F) exhibit mode collapse and unstable rollouts.
     </p>
     <div class="impl-details">
       <strong>Implementation details.</strong> Student inference is one-step at
@@ -59,16 +61,18 @@
   <div class="container">
     <h2>Problem setting</h2>
     <p>
-      We target real-time action selection for continuous-control robot tasks
-      where a high-quality diffusion teacher is available but too slow for
-      deployment. The student must satisfy two constraints simultaneously:
-      (i) preserve return and multimodal behavior from the teacher and
-      (ii) execute with one-step latency.
+      We study real-time continuous-control policy distillation under offline
+      teacher supervision. The objective is to learn a one-step student policy
+      that preserves both return quality and trajectory-distribution structure
+      of a diffusion teacher while significantly reducing per-decision latency.
     </p>
     <p>
-      We evaluate on 5 seeds with normalized return, latency, within-run
-      variability <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and
-      worst-case return, using the same protocol as the paper tables.
+      Let the teacher generate candidate trajectories and action selections
+      under the same state distribution. The student is optimized to reproduce
+      teacher-consistent behavior in a Koopman latent space with dynamic
+      transition refinement. Evaluation targets: normalized return, latency
+      statistics, within-run variability
+      <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and worst-case return.
     </p>
     <div class="impl-details">
       <strong>Implementation details.</strong> Evaluation protocol: 50 parallel
@@ -104,8 +108,31 @@
       We report results on <strong>Walker2d-medium-expert-v2</strong> and
       <strong>HalfCheetah-medium-expert-v2</strong>.
     </p>
+    <h3>Experimental protocol</h3>
+    <ul class="protocol-list">
+      <li><strong>Fixed seeds:</strong> all main and ablation statistics are aggregated over 5 random seeds (seed 0-4).</li>
+      <li><strong>Evaluator settings:</strong> 50 parallel vectorized environments, 10 episodes per seed, 1000-step episode cap, and 64 action candidates for candidate-based selectors.</li>
+      <li><strong>Normalization definition:</strong> returns are reported as D4RL normalized scores from the benchmark environment API and aggregated as mean ± std across seeds.</li>
+      <li><strong>Latency measurement:</strong> decision latency is measured per control step from policy decision start to selected action output; we report mean latency, p95 latency, and latency std (ms).</li>
+      <li><strong>Software/hardware:</strong> experiments are executed with the CleanDiffuser evaluation pipeline on Linux using GPU-enabled PyTorch inference and MuJoCo-backed D4RL simulation.</li>
+    </ul>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Offline control benchmarks are
+      evaluated in vectorized simulation with fixed protocol across methods:
+      5 random seeds, 50 parallel environments per seed, 10 episodes per seed,
+      horizon cap of 1000 steps, and 64 candidate trajectories/actions for
+      candidate-based selectors.
+    </div>
 
     <h3>Numerical results</h3>
+    <p>
+      Reported entries follow the paper table convention: mean ± standard
+      deviation across 5 seeds for return and latency, with additional
+      robustness metrics including
+      <span class="math">\(\sigma_{\mathrm{ep}}\)</span> (within-run episode
+      variability) and worst-case return (minimum run-level episode mean across
+      seeds). "Steps" denotes effective diffusion/decision steps at inference.
+    </p>
     <div class="table-wrap">
       <table class="results">
         <thead>
@@ -134,29 +161,21 @@
     </div>
 
     <h3>Paper figures: latency-performance and PCA</h3>
-    <div class="grid-2">
-      <figure class="pdf-panel">
-        <object data="assets/paper_results/walker2d_PaperFig_LatencyPerformancePareto.pdf" type="application/pdf">
-          <a href="assets/paper_results/walker2d_PaperFig_LatencyPerformancePareto.pdf">Open Walker2d latency-performance figure</a>
-        </object>
+    <div class="grid-2 paper-fig-grid">
+      <figure>
+        <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure." />
         <figcaption>Walker2d latency-performance Pareto (paper figure).</figcaption>
       </figure>
-      <figure class="pdf-panel">
-        <object data="assets/paper_results/halfcheetah_PaperFig_LatencyPerformancePareto.pdf" type="application/pdf">
-          <a href="assets/paper_results/halfcheetah_PaperFig_LatencyPerformancePareto.pdf">Open HalfCheetah latency-performance figure</a>
-        </object>
+      <figure>
+        <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure." />
         <figcaption>HalfCheetah latency-performance Pareto (paper figure).</figcaption>
       </figure>
-      <figure class="pdf-panel">
-        <object data="assets/paper_results/walker2d_PaperFig_PCA_TeacherVsOurs_seed0.pdf" type="application/pdf">
-          <a href="assets/paper_results/walker2d_PaperFig_PCA_TeacherVsOurs_seed0.pdf">Open Walker2d PCA figure</a>
-        </object>
+      <figure>
+        <img src="assets/img/pca_teacher_vs_ours_walker2d.png" alt="Walker2d PCA teacher vs FKD student." />
         <figcaption>Walker2d PCA: teacher vs FKD student.</figcaption>
       </figure>
-      <figure class="pdf-panel">
-        <object data="assets/paper_results/halfcheetah_PCA_TeacherVsOurs_seed0.pdf" type="application/pdf">
-          <a href="assets/paper_results/halfcheetah_PCA_TeacherVsOurs_seed0.pdf">Open HalfCheetah PCA figure</a>
-        </object>
+      <figure>
+        <img src="assets/img/pca_teacher_vs_ours_halfcheetah.png" alt="HalfCheetah PCA teacher vs FKD student." />
         <figcaption>HalfCheetah PCA: teacher vs FKD student.</figcaption>
       </figure>
     </div>
@@ -261,8 +280,8 @@
     <h3>Ablation: number of refinement steps <span class="math">J</span></h3>
     <p>
       We vary <span class="math">J</span> in training and inference (5 seeds each).
-      <strong>Note:</strong> <span class="math">J=1</span> uses the main checkpoint;
-      <span class="math">J \in \{2,3,4\}</span> are separately re-trained students.
+      <!-- <strong>Note:</strong> <span class="math">J=1</span> uses the main checkpoint;
+      <span class="math">J \in \{2,3,4\}</span> are separately re-trained students. -->
     </p>
     <div class="table-wrap">
       <table class="results">
@@ -304,18 +323,18 @@
   </div>
 </section>
 
-<section id="bibtex" class="section alt">
+<!-- <section id="bibtex" class="section alt">
   <div class="container">
     <h2>BibTeX</h2>
 <pre><code>@article{anonymous2026fkd,
   title   = {Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models},
   author  = {Anonymous},
-  journal = {Under review, IEEE Robotics and Automation Letters},
+  journal = {},
   year    = {2026},
   note    = {Double-blind review; author information withheld}
 }</code></pre>
   </div>
-</section>
+</section> -->
 
 <footer class="footer">
   <div class="container">
