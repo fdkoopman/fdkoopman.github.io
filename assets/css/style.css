@@ -74,7 +74,7 @@ a:hover{text-decoration:underline}
 .grid-2 figcaption{color:var(--muted);font-size:.92rem;margin-top:.4rem}
 .pdf-panel object{
   width:100%;
-  height:360px;
+  height:520px;
   border:1px solid var(--border);
   border-radius:6px;
   background:#fff;
@@ -173,6 +173,15 @@ pre code{color:inherit}
 .math{font-family:"Latin Modern Math", Cambria, Georgia, serif;font-style:italic}
 
 .note{color:var(--muted);font-size:.97rem}
+
+.impl-details{
+  margin:.9rem 0 1.4rem;
+  padding:.75rem .9rem;
+  border-left:3px solid var(--accent);
+  background:#f8faff;
+  color:#2f3543;
+  font-size:.94rem;
+}
 
 .placeholder-box{
   width:100%;

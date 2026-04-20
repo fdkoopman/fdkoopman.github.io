@@ -17,7 +17,6 @@
     <p class="subtitle">Real-Time Robot Control from Diffusion Models</p>
     <p class="authors">Anonymous Author(s)</p>
     <p class="affil">Affiliation withheld for double-blind review</p>
-    <p class="venue">Under review, IEEE Robotics and Automation Letters (RA-L)</p>
     <nav class="hero-links">
       <a class="btn disabled" aria-disabled="true">Paper (PDF)</a>
       <a class="btn disabled" aria-disabled="true">arXiv</a>
@@ -47,6 +46,12 @@
       multi-modal candidate structure that prior one-step Koopman variants
       (KDM/KDM-F) fail to maintain.
     </p>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Student inference is one-step at
+      deployment with optional refinement steps
+      <span class="math">\(J\)</span>; candidate selection uses IQL ranking
+      with argmax policy extraction in the reported setting.
+    </div>
   </div>
 </section>
 
@@ -65,6 +70,11 @@
       variability <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and
       worst-case return, using the same protocol as the paper tables.
     </p>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Evaluation protocol: 50 parallel
+      environments, 10 episodes per seed, 64 candidate actions, and D4RL
+      normalized return as the primary task metric.
+    </div>
   </div>
 </section>
 
@@ -78,6 +88,12 @@
         student for one-step deployment while preserving trajectory diversity.
       </figcaption>
     </figure>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> The FKD design follows a
+      factorized structure: latent Koopman transition for state evolution plus
+      a lightweight action head. Teacher supervision transfers both performance
+      and trajectory-structure priors into the student.
+    </div>
   </div>
 </section>
 
@@ -144,6 +160,12 @@
         <figcaption>HalfCheetah PCA: teacher vs FKD student.</figcaption>
       </figure>
     </div>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Embedded panels are sourced from
+      the uploaded paper-ready figures. Quantitative tables report 5-seed
+      aggregates with best/second-best highlighting convention consistent with
+      the manuscript.
+    </div>
 
     <h3>Simulation rollout comparison videos</h3>
     <p>
@@ -157,6 +179,11 @@
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>FKD (Ours, one-step).</strong></figcaption></figure>
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline (failure case).</figcaption></figure>
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline (failure case).</figcaption></figure>
+    </div>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> The 2×2 layout is fixed as:
+      top row = teacher and FKD; bottom row = KDM and KDM-F. This ordering is
+      chosen to foreground teacher-student fidelity before baseline failures.
     </div>
 
     <h4>HalfCheetah-medium-expert-v2</h4>
@@ -224,6 +251,12 @@
         </figure>
       </div>
     </div>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Replay scaling uses measured
+      decision-time means. Teacher playback rate is inversely proportional to
+      the teacher/student latency ratio, while student playback remains at
+      real-time speed; controls synchronize reset and start events.
+    </div>
 
     <h3>Ablation: number of refinement steps <span class="math">J</span></h3>
     <p>
@@ -262,6 +295,11 @@
       <figure><div class="placeholder-box">Hardware metrics plot placeholder</div><figcaption>Real-world return and latency metrics (to be replaced).</figcaption></figure>
       <figure><div class="placeholder-box tall">Hardware rollout video placeholder</div><figcaption>Teacher vs FKD hardware rollout (to be replaced).</figcaption></figure>
       <figure><div class="placeholder-box tall">Baseline failure video placeholder</div><figcaption>KDM/KDM-F hardware comparison (to be replaced).</figcaption></figure>
+    </div>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Placeholder panels preserve the
+      final camera-ready structure: setup image, quantitative hardware plot,
+      teacher-vs-student rollout, and baseline-failure comparison.
     </div>
   </div>
 </section>
