@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Factorized Koopman Distillation</title>
+<meta name="description" content="Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models. Anonymous project page (IEEE RA-L, double-blind review)." />
+<link rel="stylesheet" href="assets/css/style.css" />
+<meta property="og:title" content="Factorized Koopman Distillation" />
+<meta property="og:description" content="Real-Time Robot Control from Diffusion Models (anonymous project page)." />
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <h1 class="title">Factorized Koopman Distillation</h1>
+    <p class="subtitle">Real-Time Robot Control from Diffusion Models</p>
+
+    <p class="authors">Anonymous Author(s)</p>
+    <p class="affil">Affiliation withheld for double-blind review</p>
+    <p class="venue">Under review, IEEE Robotics and Automation Letters (RA-L)</p>
+
+    <nav class="hero-links">
+      <a class="btn disabled" aria-disabled="true" title="Will be released upon acceptance">Paper (PDF)</a>
+      <a class="btn disabled" aria-disabled="true" title="Will be released upon acceptance">arXiv</a>
+      <a class="btn disabled" aria-disabled="true" title="Anonymous code link upon acceptance">Code</a>
+      <a class="btn" href="#results">Results</a>
+      <a class="btn" href="#bibtex">BibTeX</a>
+    </nav>
+  </div>
+</header>
+
+<section id="teaser" class="section">
+  <div class="container">
+    <figure class="teaser">
+      <picture>
+        <source media="(min-width: 900px)" srcset="assets/img/pareto_walker2d.png" />
+        <img src="assets/img/pareto_walker2d.png" alt="Latency vs. performance Pareto front on Walker2d." />
+      </picture>
+      <figcaption>
+        <strong>One-step control, teacher-level return.</strong>
+        On D4RL MuJoCo locomotion, our distilled student sits on the top-left
+        corner of the latency–return Pareto front:
+        it preserves the 20-step diffusion teacher's performance while
+        running roughly two orders of magnitude faster, enabling real-time
+        robot control from a diffusion-based planner.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="abstract" class="section alt">
+  <div class="container">
+    <h2>Abstract</h2>
+    <p>
+      Diffusion policies produce high-quality, multi-modal action
+      trajectories, but their iterative sampling makes them impractical for
+      real-time robot control. We introduce <em>Factorized Koopman
+      Distillation (FKD)</em>, a student architecture that distills a
+      multi-step diffusion teacher into a <strong>one-step</strong>
+      controller by lifting states into a learned Koopman embedding and
+      factorizing rollout dynamics into a dynamic latent transition and a
+      lightweight action head. A small number of refinement steps
+      <span class="math">\(J\)</span> can optionally be applied at inference.
+    </p>
+    <p>
+      On D4RL MuJoCo locomotion, FKD matches or exceeds the diffusion
+      teacher's normalized return while reducing decision-time latency from
+      ~100–300 ms to ~1 ms, and it preserves the teacher's
+      multi-modal behavior — a property prior one-step Koopman
+      distillation (KDM / KDM-F) fails to reproduce, as we show both
+      quantitatively and qualitatively.
+    </p>
+  </div>
+</section>
+
+<section id="method" class="section">
+  <div class="container">
+    <h2>Method at a glance</h2>
+    <div class="grid-2">
+      <figure>
+        <img src="assets/img/pca_teacher_vs_ours_halfcheetah.png" alt="PCA of candidate rollouts, teacher vs. ours on HalfCheetah." />
+        <figcaption>HalfCheetah: our distilled student preserves the teacher's candidate distribution in action-trajectory space (PCA).</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/pca_teacher_vs_ours_walker2d.png" alt="PCA of candidate rollouts, teacher vs. ours on Walker2d." />
+        <figcaption>Walker2d: distilled candidates align with the teacher while one-step baselines collapse to a single mode.</figcaption>
+      </figure>
+    </div>
+    <div class="grid-2">
+      <figure>
+        <img src="assets/img/pca_dyn_vs_stat_halfcheetah.png" alt="Dynamic vs. static Koopman rollouts on HalfCheetah." />
+        <figcaption>HalfCheetah: dynamic Koopman rollouts span the teacher's manifold; static rollouts degenerate.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/pca_dyn_vs_stat_walker2d.png" alt="Dynamic vs. static Koopman rollouts on Walker2d." />
+        <figcaption>Walker2d: the dynamic formulation is what preserves multi-modality under factorization.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="results" class="section alt">
+  <div class="container">
+    <h2>Main results</h2>
+    <p>
+      Return, latency, within-run variability
+      <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and worst-case
+      return over 5 seeds on D4RL MuJoCo locomotion. Bold / underlined =
+      best / second-best.
+    </p>
+
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Env</th><th>Method</th><th>Return ↑</th><th>Steps</th>
+            <th>Latency (ms) ↓</th>
+            <th>σ<sub>ep</sub> ↓</th>
+            <th>Worst-case Return ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="7"><strong>Walker2d</strong></td>
+              <td>Diffusion Teacher</td>
+              <td><u>1.0295 ± 0.0051</u></td><td>20</td>
+              <td>301.22 ± 2.41</td><td><u>0.0193</u></td><td><u>0.9759</u></td></tr>
+          <tr><td>CD</td><td>0.6144 ± 0.0176</td><td>1</td><td>1.09 ± 2.33</td><td>0.0577</td><td>0.4808</td></tr>
+          <tr><td>CT</td><td>0.4404 ± 0.0096</td><td>1</td><td>1.09 ± 2.37</td><td>0.0659</td><td>0.2591</td></tr>
+          <tr><td>KDM</td><td>0.6057 ± 0.0156</td><td>1</td><td><strong>0.35 ± 0.04</strong></td><td>0.0333</td><td>0.5925</td></tr>
+          <tr><td>KDM-F</td><td>0.3386 ± 0.0070</td><td>1</td><td>0.87 ± 0.03</td><td>0.0380</td><td>0.3267</td></tr>
+          <tr class="ours"><td><strong>FKD (Ours)</strong></td>
+              <td><strong>1.0973 ± 0.0002</strong></td><td>1</td>
+              <td>1.75 ± 0.36</td><td><strong>0.0004</strong></td>
+              <td><strong>1.0963</strong></td></tr>
+          <tr><td>FKD (classifier)</td>
+              <td>1.0285 ± 0.0022</td><td>1</td>
+              <td>4.57 ± 0.87</td><td>0.0242</td><td>0.9677</td></tr>
+
+          <tr><td rowspan="7"><strong>HalfCheetah</strong></td>
+              <td>Diffusion Teacher</td>
+              <td>0.8518 ± 0.0032</td><td>20</td>
+              <td>116.51 ± 2.39</td><td><u>0.0114</u></td><td>0.8229</td></tr>
+          <tr><td>CD</td><td>0.4027 ± 0.0109</td><td>1</td><td>1.08 ± 2.32</td><td>0.0277</td><td>0.3217</td></tr>
+          <tr><td>CT</td><td>0.4089 ± 0.0047</td><td>1</td><td>1.08 ± 2.31</td><td>0.0198</td><td>0.3663</td></tr>
+          <tr><td>KDM</td><td>0.6618 ± 0.0045</td><td>1</td><td><strong>0.34 ± 0.03</strong></td><td>0.0349</td><td>0.6571</td></tr>
+          <tr><td>KDM-F</td><td>0.4852 ± 0.0098</td><td>1</td><td>0.86 ± 0.03</td><td>0.0216</td><td>0.4659</td></tr>
+          <tr class="ours"><td><strong>FKD (Ours)</strong></td>
+              <td><strong>0.8885 ± 0.0042</strong></td><td>1</td>
+              <td><u>0.82 ± 0.47</u></td><td>0.0134</td>
+              <td><strong>0.8488</strong></td></tr>
+          <tr><td>FKD (classifier)</td>
+              <td><u>0.8599 ± 0.0010</u></td><td>1</td>
+              <td>1.83 ± 0.80</td><td><strong>0.0081</strong></td><td><u>0.8417</u></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Teacher vs. Ours — qualitative rollout comparison (Walker2d)</h3>
+    <p>
+      Equally-spaced frames from the same seed and initial conditions.
+      Prior one-step Koopman distillation (KDM) loses forward locomotion,
+      while FKD reproduces the teacher's gait.
+    </p>
+    <div class="ghost-grid">
+      <div class="ghost-row">
+        <div class="ghost-label">Diffusion<br>Teacher</div>
+        <img src="assets/img/ghost_w2_teacher/frame_00.png" alt="Teacher frame 0" />
+        <img src="assets/img/ghost_w2_teacher/frame_01.png" alt="Teacher frame 1" />
+        <img src="assets/img/ghost_w2_teacher/frame_02.png" alt="Teacher frame 2" />
+        <img src="assets/img/ghost_w2_teacher/frame_03.png" alt="Teacher frame 3" />
+        <img src="assets/img/ghost_w2_teacher/frame_04.png" alt="Teacher frame 4" />
+      </div>
+      <div class="ghost-row">
+        <div class="ghost-label">KDM<br>(one-step baseline)</div>
+        <img src="assets/img/ghost_w2_kdm/frame_00.png" alt="KDM frame 0" />
+        <img src="assets/img/ghost_w2_kdm/frame_01.png" alt="KDM frame 1" />
+        <img src="assets/img/ghost_w2_kdm/frame_02.png" alt="KDM frame 2" />
+        <img src="assets/img/ghost_w2_kdm/frame_03.png" alt="KDM frame 3" />
+        <img src="assets/img/ghost_w2_kdm/frame_04.png" alt="KDM frame 4" />
+      </div>
+      <div class="ghost-row">
+        <div class="ghost-label"><strong>FKD (Ours)</strong></div>
+        <img src="assets/img/ghost_w2_ours/frame_00.png" alt="Ours frame 0" />
+        <img src="assets/img/ghost_w2_ours/frame_01.png" alt="Ours frame 1" />
+        <img src="assets/img/ghost_w2_ours/frame_02.png" alt="Ours frame 2" />
+        <img src="assets/img/ghost_w2_ours/frame_03.png" alt="Ours frame 3" />
+        <img src="assets/img/ghost_w2_ours/frame_04.png" alt="Ours frame 4" />
+      </div>
+    </div>
+
+    <h3>One-step baseline failures (KDM / KDM-F)</h3>
+    <div class="grid-2">
+      <figure>
+        <img src="assets/img/kdm_failure_walker2d.png" alt="KDM failure on Walker2d" />
+        <figcaption>KDM on Walker2d: mode collapse leads to fall.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/kdmf_failure_walker2d.png" alt="KDM-F failure on Walker2d" />
+        <figcaption>KDM-F on Walker2d: unstable gait under factorization.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/kdm_failure_halfcheetah.png" alt="KDM failure on HalfCheetah" />
+        <figcaption>KDM on HalfCheetah: candidate rollouts collapse.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/kdmf_failure_halfcheetah.png" alt="KDM-F failure on HalfCheetah" />
+        <figcaption>KDM-F on HalfCheetah: return far below teacher.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="ablation" class="section">
+  <div class="container">
+    <h2>Ablation: number of refinement steps <span class="math">J</span></h2>
+    <p>
+      We vary <span class="math">J</span> in training and inference (5 seeds
+      each, IQL scoring + argmax selection, 64 candidates, 50 parallel
+      environments, 10 episodes per seed). Latency reports mean decision
+      time ± mean intra-run timing variability, consistent with the main
+      table.
+      <strong>Note:</strong> <span class="math">J=1</span> uses our main
+      checkpoint; <span class="math">J \in \{2,3,4\}</span> re-trains
+      separate students, so the sweep spans both training and inference
+      iteration count.
+    </p>
+
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Task</th><th>J</th>
+            <th>Return ↑</th><th>Latency (ms) ↓</th>
+            <th>σ<sub>ep</sub> ↓</th>
+            <th>Worst-case Return ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="4"><strong>Walker2d</strong></td>
+              <td>1</td><td>1.0973 ± 0.0002</td><td>1.75 ± 0.36</td><td>0.0004</td><td>1.0963</td></tr>
+          <tr><td>2</td><td>1.0951 ± 0.0001</td><td>3.03 ± 0.51</td><td>0.0003</td><td>1.0945</td></tr>
+          <tr><td>3</td><td>1.0977 ± 0.0002</td><td>3.24 ± 0.49</td><td>0.0004</td><td>1.0965</td></tr>
+          <tr class="ours"><td>4</td>
+              <td><strong>1.0995 ± 0.0001</strong></td>
+              <td>3.63 ± 0.41</td>
+              <td><strong>0.0002</strong></td>
+              <td><strong>1.0988</strong></td></tr>
+
+          <tr><td rowspan="4"><strong>HalfCheetah</strong></td>
+              <td>1</td>
+              <td><strong>0.8885 ± 0.0042</strong></td>
+              <td><strong>0.82 ± 0.47</strong></td>
+              <td><strong>0.0134</strong></td>
+              <td><strong>0.8488</strong></td></tr>
+          <tr><td>2</td><td>0.8767 ± 0.0027</td><td>0.94 ± 0.35</td><td>0.0127</td><td>0.8514</td></tr>
+          <tr><td>3</td><td>0.8178 ± 0.0012</td><td>1.10 ± 0.35</td><td>0.0180</td><td>0.7566</td></tr>
+          <tr><td>4</td><td>0.8774 ± 0.0015</td><td>1.26 ± 0.35</td><td>0.0117</td><td>0.8486</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      <em>Walker2d</em> tolerates larger <span class="math">J</span>, with a
+      small but consistent improvement in return and worst-case return at
+      <span class="math">J=4</span>, at the cost of roughly 2× latency.
+      <em>HalfCheetah</em> is non-monotonic: <span class="math">J=1</span>
+      already matches the best re-trained setting, and
+      <span class="math">J=3</span> is notably degraded. Extra refinement is
+      therefore task-dependent; one-step deployment remains the
+      strongest accuracy–latency trade-off on HalfCheetah.
+    </p>
+  </div>
+</section>
+
+<section id="additional" class="section alt">
+  <div class="container">
+    <h2>Additional analyses</h2>
+    <div class="grid-2">
+      <figure>
+        <img src="assets/img/multimodality_walker2d.png" alt="Multimodality preservation on Walker2d." />
+        <figcaption>Multimodality preservation, Walker2d.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/multimodality_halfcheetah.png" alt="Multimodality preservation on HalfCheetah." />
+        <figcaption>Multimodality preservation, HalfCheetah.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/realtime_walker2d.png" alt="Real-time capability on Walker2d." />
+        <figcaption>Real-time capability (latency distribution), Walker2d.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/realtime_halfcheetah.png" alt="Real-time capability on HalfCheetah." />
+        <figcaption>Real-time capability (latency distribution), HalfCheetah.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/robustness_walker2d.png" alt="Robustness sweep on Walker2d." />
+        <figcaption>Robustness across seeds and candidates, Walker2d.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/robustness_halfcheetah.png" alt="Robustness sweep on HalfCheetah." />
+        <figcaption>Robustness across seeds and candidates, HalfCheetah.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/pareto_halfcheetah.png" alt="Latency–performance Pareto on HalfCheetah." />
+        <figcaption>Latency–return Pareto, HalfCheetah.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/pareto_walker2d.png" alt="Latency–performance Pareto on Walker2d." />
+        <figcaption>Latency–return Pareto, Walker2d.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="bibtex" class="section">
+  <div class="container">
+    <h2>BibTeX</h2>
+<pre><code>@article{anonymous2026fkd,
+  title   = {Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models},
+  author  = {Anonymous},
+  journal = {Under review, IEEE Robotics and Automation Letters},
+  year    = {2026},
+  note    = {Double-blind review; author information withheld}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>
+      Anonymous project page for double-blind peer review.
+      No identifying information is disclosed on this site or in its
+      repository history.
+    </p>
+    <p>
+      Page layout inspired by common Nerfies-style academic templates;
+      content and figures are original to this submission.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
