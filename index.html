@@ -151,12 +151,18 @@
     <h3>Paper figures: latency-performance and PCA</h3>
     <div class="grid-2 paper-fig-grid">
       <figure>
-        <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure." />
-        <figcaption>Walker2d latency-performance Pareto (paper figure).</figcaption>
+        <object class="pareto-pdf" data="assets/paper_results/walker2d_PaperFig_LatencyPerformancePareto.pdf" type="application/pdf" width="100%" height="420" aria-label="Walker2d latency-performance Pareto figure.">
+          <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure." />
+        </object>
+        <p class="pdf-open"><a href="assets/paper_results/walker2d_PaperFig_LatencyPerformancePareto.pdf" target="_blank" rel="noopener">Open vector PDF</a></p>
+        <figcaption>Walker2d latency-performance Pareto (paper PDF; raster fallback if PDF does not display).</figcaption>
       </figure>
       <figure>
-        <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure." />
-        <figcaption>HalfCheetah latency-performance Pareto (paper figure).</figcaption>
+        <object class="pareto-pdf" data="assets/paper_results/halfcheetah_PaperFig_LatencyPerformancePareto.pdf" type="application/pdf" width="100%" height="420" aria-label="HalfCheetah latency-performance Pareto figure.">
+          <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure." />
+        </object>
+        <p class="pdf-open"><a href="assets/paper_results/halfcheetah_PaperFig_LatencyPerformancePareto.pdf" target="_blank" rel="noopener">Open vector PDF</a></p>
+        <figcaption>HalfCheetah latency-performance Pareto (paper PDF; raster fallback if PDF does not display).</figcaption>
       </figure>
       <figure>
         <img src="assets/img/pca_teacher_vs_ours_walker2d.png" alt="Walker2d PCA teacher vs Ours." />
@@ -291,22 +297,77 @@
 
 <section id="hardware" class="section">
   <div class="container">
-    <h2>Hardware environment and results</h2>
+    <h2>Hardware: Teacher vs Ours</h2>
     <p>
-      Hardware (Kinova) assets are intentionally withheld in the current
-      anonymous submission snapshot. Placeholder blocks are provided and can be
-      replaced directly with your final figures and videos.
+      On the physical manipulator, we compare only the diffusion teacher and our
+      one-step distilled policy under the same control interface and evaluation
+      protocol. Fill the table with your measured task returns, decision latency,
+      and within-run variability; add rollout videos and representative snapshots
+      at the paths below.
     </p>
-    <div class="grid-2">
-      <figure><div class="placeholder-box">Hardware setup image placeholder</div><figcaption>Experimental platform overview (to be replaced).</figcaption></figure>
-      <figure><div class="placeholder-box">Hardware metrics plot placeholder</div><figcaption>Real-world return and latency metrics (to be replaced).</figcaption></figure>
-      <figure><div class="placeholder-box tall">Hardware rollout video placeholder</div><figcaption>Teacher vs Ours hardware rollout (to be replaced).</figcaption></figure>
-      <figure><div class="placeholder-box tall">Baseline failure video placeholder</div><figcaption>KDM/KDM-F hardware comparison (to be replaced).</figcaption></figure>
+
+    <h3>Experimental setup</h3>
+    <p class="note">Optional: add a de-identified platform photo at <code>website/assets/img/hardware_setup.png</code>.</p>
+    <figure class="hardware-setup-figure">
+      <img src="assets/img/hardware_setup.png" alt="Physical robot and workspace (optional)." />
+      <figcaption>Experimental platform (optional; omit or replace the image file).</figcaption>
+    </figure>
+
+    <h3>Real-world quantitative results</h3>
+    <div class="table-wrap">
+      <table class="results hardware-results">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Return ↑</th>
+            <th>Latency mean (ms) ↓</th>
+            <th>Latency p95 (ms) ↓</th>
+            <th>σ<sub>ep</sub> ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Diffusion Teacher</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr class="ours"><td><strong>Ours (FKD)</strong></td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
     </div>
+    <p class="note">Replace em dashes with your hardware run aggregates (mean ± std over seeds if applicable). Leave p95 blank if you only report mean latency.</p>
+
+    <h3>Rollout videos</h3>
+    <p class="note">Place MP4 files at <code>website/assets/videos/hardware_teacher.mp4</code> and <code>website/assets/videos/hardware_ours.mp4</code>.</p>
+    <div class="video-grid hardware-video-grid">
+      <figure>
+        <video controls muted loop playsinline preload="metadata">
+          <source src="assets/videos/hardware_teacher.mp4" type="video/mp4" />
+        </video>
+        <figcaption>Diffusion Teacher (hardware).</figcaption>
+      </figure>
+      <figure>
+        <video controls muted loop playsinline preload="metadata">
+          <source src="assets/videos/hardware_ours.mp4" type="video/mp4" />
+        </video>
+        <figcaption><strong>Ours (FKD)</strong> (hardware).</figcaption>
+      </figure>
+    </div>
+
+    <h3>Snapshot comparison</h3>
+    <p class="note">Add paired still frames at <code>website/assets/img/hardware_snapshot_teacher.png</code> and <code>website/assets/img/hardware_snapshot_ours.png</code> (same timestep / viewpoint).</p>
+    <div class="grid-2 hardware-snap-grid">
+      <figure>
+        <img src="assets/img/hardware_snapshot_teacher.png" alt="Hardware snapshot: diffusion teacher policy." />
+        <figcaption>Diffusion Teacher</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/img/hardware_snapshot_ours.png" alt="Hardware snapshot: our distilled policy." />
+        <figcaption><strong>Ours (FKD)</strong></figcaption>
+      </figure>
+    </div>
+
     <div class="impl-details">
-      <strong>Implementation details.</strong> Placeholder panels preserve the
-      final camera-ready structure: setup image, quantitative hardware plot,
-      teacher-vs-student rollout, and baseline-failure comparison.
+      <strong>Implementation details.</strong> This block is intentionally limited to
+      teacher vs student: no baseline columns in the table, and no extra method
+      videos. The setup figure and p95 column are optional. Swap in your Kinova (or
+      platform) numbers and media without changing layout.
     </div>
   </div>
 </section>
