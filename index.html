@@ -301,9 +301,9 @@
     </p>
 
     <h3>Experimental setup</h3>
-    <p class="note">Optional: add a de-identified platform photo at <code>website/assets/img/hardware_setup.png</code>.</p>
+    <p class="note">Optional platform photo (currently using your uploaded snapshot file).</p>
     <figure class="hardware-setup-figure">
-      <img src="assets/img/hardware_setup.png" alt="Physical robot and workspace (optional)." />
+      <img src="hardware_videos/Kinova_real-world-snapshot.png" alt="Physical robot and workspace snapshot." />
       <figcaption>Experimental platform (optional; omit or replace the image file).</figcaption>
     </figure>
 
@@ -328,19 +328,31 @@
     <p class="note">Replace em dashes with your hardware run aggregates (mean ± std over seeds if applicable). Leave p95 blank if you only report mean latency.</p>
 
     <h3>Rollout videos</h3>
-    <p class="note">Place MP4 files at <code>website/assets/videos/hardware_teacher.mp4</code> and <code>website/assets/videos/hardware_ours.mp4</code>.</p>
+    <p class="note">Teacher videos are inserted now; student-policy videos are left blank intentionally for later upload.</p>
     <div class="video-grid hardware-video-grid">
       <figure>
+        <span class="status-badge uploaded">Uploaded</span>
         <video controls muted loop playsinline preload="metadata">
-          <source src="assets/videos/hardware_teacher.mp4" type="video/mp4" />
+          <source src="hardware_videos/Kinova_simulation_teacher_rollout_video.mp4" type="video/mp4" />
         </video>
-        <figcaption>Diffusion Teacher (hardware).</figcaption>
+        <figcaption>Diffusion Teacher (simulation).</figcaption>
       </figure>
       <figure>
+        <span class="status-badge pending">Pending</span>
+        <div class="placeholder-box">Ours (FKD) simulation video<br/>coming soon</div>
+        <figcaption><strong>Ours (FKD)</strong> (simulation).</figcaption>
+      </figure>
+      <figure>
+        <span class="status-badge uploaded">Uploaded</span>
         <video controls muted loop playsinline preload="metadata">
-          <source src="assets/videos/hardware_ours.mp4" type="video/mp4" />
+          <source src="hardware_videos/Kinova_real-world_teacher_rollout_video.mp4" type="video/mp4" />
         </video>
-        <figcaption><strong>Ours (FKD)</strong> (hardware).</figcaption>
+        <figcaption>Diffusion Teacher (real-world).</figcaption>
+      </figure>
+      <figure>
+        <span class="status-badge pending">Pending</span>
+        <div class="placeholder-box">Ours (FKD) real-world video<br/>coming soon</div>
+        <figcaption><strong>Ours (FKD)</strong> (real-world).</figcaption>
       </figure>
     </div>
 
