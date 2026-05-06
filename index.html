@@ -380,14 +380,23 @@
     </figure>
 
     <h3>Simulation vs hardware comparison</h3>
+    <p class="note">Metrics below are replotted from the provided Kinova deployment summaries (teacher vs FKD).</p>
     <div class="grid-2 hardware-compare-grid">
       <figure>
         <img src="hardware_videos/Kinova_success_rate.png" alt="Comparison of success rate in simulation and hardware." />
-        <figcaption>Success rate comparison (simulation vs hardware).</figcaption>
+        <figcaption>Task success rate (real-world deployment).</figcaption>
       </figure>
       <figure>
         <img src="hardware_videos/Kinova_completion_time.png" alt="Comparison of completion time in simulation and hardware." />
-        <figcaption>Completion time comparison (simulation vs hardware).</figcaption>
+        <figcaption>Task completion time (real-world deployment).</figcaption>
+      </figure>
+      <figure>
+        <img src="hardware_videos/Kinova_inference_latency.png" alt="Comparison of inference latency in real-world deployment." />
+        <figcaption>Inference latency per control step (mean and p95).</figcaption>
+      </figure>
+      <figure>
+        <img src="hardware_videos/Kinova_safety_clearance.png" alt="Comparison of minimum obstacle clearance in real-world deployment." />
+        <figcaption>Minimum obstacle-surface clearance (safety margin).</figcaption>
       </figure>
     </div>
 
