@@ -328,32 +328,34 @@
     <p class="note">Replace em dashes with your hardware run aggregates (mean ± std over seeds if applicable). Leave p95 blank if you only report mean latency.</p>
 
     <h3>Rollout videos</h3>
-    <p class="note">Simulation teacher/student videos are updated; real-world student-policy video remains pending upload.</p>
+    <p class="note">Simulation and real-world teacher/student rollouts are shown below for direct visual comparison.</p>
     <div class="video-grid hardware-video-grid">
       <figure>
         <span class="status-badge uploaded">Uploaded</span>
         <video controls muted loop playsinline preload="metadata">
-          <source src="sim_videos/sim_teacher_diffusion.mp4?v=2" type="video/mp4" />
+          <source src="sim_videos/sim_teacher_diffusion.mp4" type="video/mp4" />
         </video>
-        <figcaption>Diffusion Teacher (simulation). <a href="sim_videos/sim_teacher_diffusion.mp4?v=2" target="_blank" rel="noopener">Open video file</a>.</figcaption>
+        <figcaption>Diffusion Teacher (simulation).</figcaption>
       </figure>
       <figure>
         <span class="status-badge uploaded">Uploaded</span>
         <video controls muted loop playsinline preload="metadata">
-          <source src="sim_videos/sim_student_koopman.mp4?v=2" type="video/mp4" />
+          <source src="sim_videos/sim_student_koopman.mp4" type="video/mp4" />
         </video>
-        <figcaption><strong>Ours (FKD)</strong> (simulation). <a href="sim_videos/sim_student_koopman.mp4?v=2" target="_blank" rel="noopener">Open video file</a>.</figcaption>
+        <figcaption><strong>Ours (FKD)</strong> (simulation).</figcaption>
       </figure>
       <figure>
         <span class="status-badge uploaded">Uploaded</span>
         <video controls muted loop playsinline preload="metadata">
-          <source src="hardware_videos/Kinova_real-world_teacher_rollout_video.mp4" type="video/mp4" />
+          <source src="hardware_videos/Kinova_teacher_real_world.mp4" type="video/mp4" />
         </video>
         <figcaption>Diffusion Teacher (real-world).</figcaption>
       </figure>
       <figure>
-        <span class="status-badge pending">Pending</span>
-        <div class="placeholder-box">Ours (FKD) real-world video<br/>coming soon</div>
+        <span class="status-badge uploaded">Uploaded</span>
+        <video controls muted loop playsinline preload="metadata">
+          <source src="hardware_videos/Kinova_student_real_world.mp4" type="video/mp4" />
+        </video>
         <figcaption><strong>Ours (FKD)</strong> (real-world).</figcaption>
       </figure>
     </div>

@@ -55,5 +55,21 @@
     reset();
   }
 
+  function setupHardwareRolloutPlayback() {
+    const videos = document.querySelectorAll(".hardware-video-grid video");
+    videos.forEach((video) => {
+      const setRate = () => {
+        video.playbackRate = 2.0;
+        video.defaultPlaybackRate = 2.0;
+      };
+      if (video.readyState >= 1) {
+        setRate();
+      } else {
+        video.addEventListener("loadedmetadata", setRate, { once: true });
+      }
+    });
+  }
+
   document.querySelectorAll(".latency-demo").forEach(setupLatencyDemo);
+  setupHardwareRolloutPlayback();
 })();
