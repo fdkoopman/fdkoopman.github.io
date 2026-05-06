@@ -313,19 +313,49 @@
         <thead>
           <tr>
             <th>Method</th>
-            <th>Return ↑</th>
-            <th>Latency mean (ms) ↓</th>
-            <th>Latency p95 (ms) ↓</th>
-            <th>σ<sub>ep</sub> ↓</th>
+            <th>Task completion ↑</th>
+            <th>Task success ↑</th>
+            <th>Completion time (s) ↓</th>
+            <th>Executed steps</th>
+            <th>Inference mean (ms) ↓</th>
+            <th>Inference p95 (ms) ↓</th>
+            <th>Final goal error ↓</th>
+            <th>Min obstacle clearance (m) ↑</th>
+            <th>Measured control Hz ↑</th>
+            <th>Overrun ratio ↓</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>Diffusion Teacher</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr class="ours"><td><strong>Ours (FKD)</strong></td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr>
+            <td>Diffusion Teacher</td>
+            <td>1.0000</td>
+            <td>True</td>
+            <td>317.25</td>
+            <td>6507</td>
+            <td>151.2</td>
+            <td>156.8</td>
+            <td>0.003223</td>
+            <td>0.036975</td>
+            <td>80.003</td>
+            <td>0.501</td>
+          </tr>
+          <tr class="ours">
+            <td><strong>Ours (FKD)</strong></td>
+            <td><strong>1.0000</strong></td>
+            <td><strong>True</strong></td>
+            <td><strong>85.87</strong></td>
+            <td>6819</td>
+            <td><strong>4.1</strong></td>
+            <td><strong>4.8</strong></td>
+            <td>0.003603</td>
+            <td><strong>0.042831</strong></td>
+            <td><strong>80.012</strong></td>
+            <td>0.502</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <p class="note">Replace em dashes with your hardware run aggregates (mean ± std over seeds if applicable). Leave p95 blank if you only report mean latency.</p>
+    <p class="note">Values are taken from the provided single-run deployment summaries for diffusion teacher and FKD on Kinova. For camera-ready, replace with mean ± std aggregates across repeated hardware trials if available.</p>
 
     <h3>Rollout videos</h3>
     <p class="note">Simulation and real-world teacher/student rollouts are shown below for direct visual comparison.</p>
