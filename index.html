@@ -295,16 +295,16 @@
     <p>
       On the physical manipulator, we compare only the diffusion teacher and our
       one-step distilled policy under the same control interface and evaluation
-      protocol. Fill the table with your measured task returns, decision latency,
-      and within-run variability; add rollout videos and representative snapshots
-      at the paths below.
+      protocol. This section reports aggregated statistics over 50 real-world
+      trials per method, together with rollout videos and front-view qualitative
+      comparisons.
     </p>
 
     <h3>Experimental setup</h3>
-    <p class="note">Optional platform photo (currently using your uploaded snapshot file).</p>
+    <p class="note">Physical platform and workspace used for Kinova point-to-point obstacle-avoidance trials.</p>
     <figure class="hardware-setup-figure">
       <img src="hardware_videos/Kinova_real-world-snapshot.png" alt="Physical robot and workspace snapshot." />
-      <figcaption>Experimental platform (optional; omit or replace the image file).</figcaption>
+      <figcaption>Experimental platform for real-world evaluation.</figcaption>
     </figure>
 
     <h3>Real-world quantitative results</h3>
@@ -328,34 +328,34 @@
         <tbody>
           <tr>
             <td>Diffusion Teacher</td>
-            <td>1.0000</td>
-            <td>True</td>
-            <td>317.25</td>
-            <td>6507</td>
-            <td>151.2</td>
-            <td>156.8</td>
-            <td>0.003223</td>
-            <td>0.036975</td>
-            <td>80.003</td>
-            <td>0.501</td>
+            <td>1.0000 ± 0.0000</td>
+            <td>100% (50/50)</td>
+            <td>314.95 ± 3.54</td>
+            <td>25195.62 ± 283.24</td>
+            <td>151.00 ± 3.73</td>
+            <td>158.27 ± 3.78</td>
+            <td>0.003093 ± 0.001421</td>
+            <td>0.046289 ± 0.012908</td>
+            <td>80.005 ± 0.025</td>
+            <td>0.5013 ± 0.0251</td>
           </tr>
           <tr class="ours">
-            <td><strong>Ours (FKD)</strong></td>
-            <td><strong>1.0000</strong></td>
-            <td><strong>True</strong></td>
-            <td><strong>85.87</strong></td>
-            <td>6819</td>
-            <td><strong>4.1</strong></td>
-            <td><strong>4.8</strong></td>
-            <td>0.003603</td>
-            <td><strong>0.042831</strong></td>
-            <td><strong>80.012</strong></td>
-            <td>0.502</td>
+            <td><strong>Ours</strong></td>
+            <td><strong>1.0000 ± 0.0000</strong></td>
+            <td><strong>100% (50/50)</strong></td>
+            <td><strong>85.43 ± 2.53</strong></td>
+            <td>6834.24 ± 202.67</td>
+            <td><strong>4.08 ± 0.20</strong></td>
+            <td><strong>4.73 ± 0.23</strong></td>
+            <td>0.003458 ± 0.001745</td>
+            <td><strong>0.048953 ± 0.012117</strong></td>
+            <td>79.999 ± 0.019</td>
+            <td>0.5020 ± 0.0245</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p class="note">Values are taken from the provided single-run deployment summaries for diffusion teacher and FKD on Kinova. For camera-ready, replace with mean ± std aggregates across repeated hardware trials if available.</p>
+    <p class="note">Values are aggregated from 50 real-world trials per method (mean ± std). Inference columns are reported in milliseconds; task success is shown as success rate with counts.</p>
 
     <h3>Rollout videos</h3>
     <p class="note">Simulation and real-world teacher/student rollouts are shown below for direct visual comparison.</p>
@@ -372,74 +372,73 @@
         <video controls muted loop playsinline preload="metadata">
           <source src="sim_videos/sim_student_koopman.mp4" type="video/mp4" />
         </video>
-        <figcaption><strong>Ours (FKD)</strong> (simulation).</figcaption>
+        <figcaption><strong>Ours</strong> (simulation).</figcaption>
       </figure>
       <figure>
-        <span class="status-badge uploaded">Uploaded</span>
-        <video controls muted loop playsinline preload="metadata">
+        <span class="status-badge speedup">2x Speed</span>
+        <video class="realworld-speedup" controls muted loop playsinline preload="metadata">
           <source src="hardware_videos/Kinova_teacher_real_world.mp4" type="video/mp4" />
         </video>
         <figcaption>Diffusion Teacher (real-world).</figcaption>
       </figure>
       <figure>
-        <span class="status-badge uploaded">Uploaded</span>
-        <video controls muted loop playsinline preload="metadata">
+        <span class="status-badge speedup">2x Speed</span>
+        <video class="realworld-speedup" controls muted loop playsinline preload="metadata">
           <source src="hardware_videos/Kinova_student_real_world.mp4" type="video/mp4" />
         </video>
-        <figcaption><strong>Ours (FKD)</strong> (real-world).</figcaption>
+        <figcaption><strong>Ours</strong> (real-world).</figcaption>
       </figure>
     </div>
 
-    <h3>Snapshot comparison</h3>
-    <p class="note">Add paired still frames at <code>website/assets/img/hardware_snapshot_teacher.png</code> and <code>website/assets/img/hardware_snapshot_ours.png</code> (same timestep / viewpoint).</p>
-    <div class="grid-2 hardware-snap-grid">
+    <h3>Front-view real-world comparison</h3>
+    <p class="note">
+      The paired front-view recordings below replace the prior still-frame
+      snapshot comparison block and provide a clearer viewpoint for trajectory
+      and obstacle-avoidance behavior.
+    </p>
+    <div class="video-grid hardware-video-grid">
       <figure>
-        <img src="assets/img/hardware_snapshot_teacher.png" alt="Hardware snapshot: diffusion teacher policy." />
-        <figcaption>Diffusion Teacher</figcaption>
+        <span class="status-badge speedup">2x Speed</span>
+        <video class="realworld-speedup" controls muted loop playsinline preload="metadata">
+          <source src="hardware_videos/Kinova_front_view_teacher.mp4" type="video/mp4" />
+        </video>
+        <figcaption>Diffusion Teacher (real-world, front view).</figcaption>
       </figure>
       <figure>
-        <img src="assets/img/hardware_snapshot_ours.png" alt="Hardware snapshot: our distilled policy." />
-        <figcaption><strong>Ours (FKD)</strong></figcaption>
+        <span class="status-badge speedup">2x Speed</span>
+        <video class="realworld-speedup" controls muted loop playsinline preload="metadata">
+          <source src="hardware_videos/Kinova_front_view_student.mp4" type="video/mp4" />
+        </video>
+        <figcaption><strong>Ours</strong> (real-world, front view).</figcaption>
       </figure>
     </div>
 
-    <h3>Snapshot sequence comparison</h3>
-    <figure class="hardware-sequence-figure">
-      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion.png" alt="Kinova snapshot sequence comparison across planning methods." />
-      <figcaption>
-        Snapshot sequence comparison on Kinova task. The teacher trajectory shows
-        slower, more hesitant corrective motion near obstacles, whereas FKD
-        replans earlier and traverses the narrow region with smoother
-        collision-avoidance behavior and faster goal convergence.
-      </figcaption>
-    </figure>
-
-    <h3>Simulation vs hardware comparison</h3>
-    <p class="note">Metrics below are replotted from the provided Kinova deployment summaries (teacher vs FKD).</p>
+    <h3>Real-world deployment metrics (50 trials)</h3>
+    <p class="note">All figures below are replotted from <code>website/metrics_table.csv</code> using 50 real-world runs per method.</p>
     <div class="grid-2 hardware-compare-grid">
       <figure>
-        <img src="hardware_videos/Kinova_success_rate.png" alt="Comparison of success rate in simulation and hardware." />
+        <img src="hardware_videos/Kinova_success_rate.png" alt="Task success rate across 50 real-world trials for teacher and Ours." />
         <figcaption>Task success rate (real-world deployment).</figcaption>
       </figure>
       <figure>
-        <img src="hardware_videos/Kinova_completion_time.png" alt="Comparison of completion time in simulation and hardware." />
-        <figcaption>Task completion time (real-world deployment).</figcaption>
+        <img src="hardware_videos/Kinova_completion_time.png" alt="Task completion time mean and standard deviation across real-world trials." />
+        <figcaption>Task completion time (mean ± std, real-world).</figcaption>
       </figure>
       <figure>
-        <img src="hardware_videos/Kinova_inference_latency.png" alt="Comparison of inference latency in real-world deployment." />
-        <figcaption>Inference latency per control step (mean and p95).</figcaption>
+        <img src="hardware_videos/Kinova_inference_latency.png" alt="Inference latency per control step showing mean and p95 for both methods." />
+        <figcaption>Inference latency per control step (mean and p95, real-world).</figcaption>
       </figure>
       <figure>
-        <img src="hardware_videos/Kinova_safety_clearance.png" alt="Comparison of minimum obstacle clearance in real-world deployment." />
-        <figcaption>Minimum obstacle-surface clearance (safety margin).</figcaption>
+        <img src="hardware_videos/Kinova_safety_clearance.png" alt="Minimum obstacle-surface clearance mean and standard deviation across real-world trials." />
+        <figcaption>Minimum obstacle-surface clearance (mean ± std safety margin).</figcaption>
       </figure>
     </div>
 
     <div class="impl-details">
-      <strong>Implementation details.</strong> This block is intentionally limited to
-      teacher vs student: no baseline columns in the table, and no extra method
-      videos. The setup figure and p95 column are optional. Swap in your Kinova (or
-      platform) numbers and media without changing layout.
+      <strong>Implementation details.</strong> Hardware reporting is restricted to
+      teacher vs Ours for direct deployment comparison. Quantitative entries and
+      figures are generated from the same 50-trial CSV to keep table values and
+      plots numerically consistent.
     </div>
   </div>
 </section>

@@ -131,6 +131,11 @@ a:hover{text-decoration:underline}
   color:#8c4f0b;
   border-color:#ffd8a8;
 }
+.status-badge.speedup{
+  background:#e8f1ff;
+  color:#174ea6;
+  border-color:#bfd3ff;
+}
 
 .latency-demo{
   margin:1.1rem 0 2rem;

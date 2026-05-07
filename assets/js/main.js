@@ -56,7 +56,7 @@
   }
 
   function setupHardwareRolloutPlayback() {
-    const videos = document.querySelectorAll(".hardware-video-grid video");
+    const videos = document.querySelectorAll(".hardware-video-grid video.realworld-speedup");
     videos.forEach((video) => {
       const setRate = () => {
         video.playbackRate = 2.0;
