@@ -59,8 +59,8 @@
     const videos = document.querySelectorAll(".hardware-video-grid video.realworld-speedup");
     videos.forEach((video) => {
       const setRate = () => {
-        video.playbackRate = 2.0;
-        video.defaultPlaybackRate = 2.0;
+        video.playbackRate = 3.0;
+        video.defaultPlaybackRate = 3.0;
       };
       if (video.readyState >= 1) {
         setRate();
@@ -70,6 +70,40 @@
     });
   }
 
+  function setupSyncDemo(root) {
+    const teacher = root.querySelector(".teacher-video");
+    const student = root.querySelector(".student-video");
+    const playBtn = root.querySelector(".sync-play");
+    const resetBtn = root.querySelector(".reset-playback");
+    const speed = Number(root.dataset.speed || "3");
+    if (!teacher || !student || !playBtn || !resetBtn) return;
+
+    function reset() {
+      teacher.pause();
+      student.pause();
+      teacher.currentTime = 0;
+      student.currentTime = 0;
+      teacher.playbackRate = speed;
+      student.playbackRate = speed;
+      teacher.defaultPlaybackRate = speed;
+      student.defaultPlaybackRate = speed;
+    }
+
+    async function syncPlay() {
+      reset();
+      try {
+        await Promise.all([teacher.play(), student.play()]);
+      } catch (_) {
+        // Keep manual controls available if autoplay is restricted.
+      }
+    }
+
+    playBtn.addEventListener("click", syncPlay);
+    resetBtn.addEventListener("click", reset);
+    reset();
+  }
+
   document.querySelectorAll(".latency-demo").forEach(setupLatencyDemo);
+  document.querySelectorAll(".sync-demo").forEach(setupSyncDemo);
   setupHardwareRolloutPlayback();
 })();
