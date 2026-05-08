@@ -393,9 +393,8 @@
 
     <h3>Front-view real-world comparison</h3>
     <p class="note">
-      The paired front-view recordings below replace the prior still-frame
-      snapshot comparison block and provide a clearer viewpoint for trajectory
-      and obstacle-avoidance behavior.
+      The paired front-view recordings provide an additional viewpoint for
+      trajectory and obstacle-avoidance behavior.
     </p>
     <div class="video-grid hardware-video-grid">
       <figure>
@@ -413,6 +412,16 @@
         <figcaption><strong>Ours</strong> (real-world, front view).</figcaption>
       </figure>
     </div>
+
+    <h3>Snapshot sequence comparison</h3>
+    <figure class="hardware-sequence-figure">
+      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion.png?v=20260508a" alt="Kinova snapshot sequence comparison between diffusion teacher and Ours." />
+      <figcaption>
+        Six-frame comparison with per-frame timestamps and behavior labels.
+        The final teacher snapshot uses <em>t=318s</em>, while Ours reaches
+        successful completion earlier.
+      </figcaption>
+    </figure>
 
     <h3>Real-world deployment metrics (50 trials)</h3>
     <p class="note">All figures below are generated from <code>website/metrics_table.csv</code> (50 real-world trials per method; submission-ready plotting and reporting).</p>
