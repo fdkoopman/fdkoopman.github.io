@@ -316,6 +316,11 @@
     </p>
     <div class="table-wrap">
       <table class="results hardware-results">
+        <caption>
+          Simulation (no-physics) quantitative results for diffusion-step settings
+          30/40/50 (100 rollouts per method and setting). Success is measured with
+          the rollout goal-tolerance criterion (<span class="math">goal\_tol \approx 0.02</span>).
+        </caption>
         <thead>
           <tr>
             <th>Method</th>
@@ -404,6 +409,13 @@
       decision latency and completion time, while Ours remains in the sub-millisecond
       decision-time regime with nearly unchanged completion time. In this no-physics setup,
       the teacher has higher success rate, whereas Ours exhibits larger safety clearance on average.
+      In addition, the reduced success rate of Ours in this table is primarily associated with
+      goal-reaching/timing criteria rather than collision events; student rollouts in this
+      no-physics evaluation remain non-colliding under the applied safety constraints.
+      The reported final-goal errors are interpreted relative to the success threshold
+      (<span class="math">goal\_tol</span>, typically around 0.02 in these scripts); increasing
+      that threshold to a very large value (e.g., 4) would artificially mark nearly all runs
+      as solved and is not a valid setting for fair comparison.
     </p>
 
     <h3>Real-world quantitative results</h3>
