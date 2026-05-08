@@ -121,16 +121,6 @@ a:hover{text-decoration:underline}
   line-height:1.2;
   border:1px solid transparent;
 }
-.status-badge.uploaded{
-  background:#eafaf1;
-  color:#146c43;
-  border-color:#b8e7cb;
-}
-.status-badge.pending{
-  background:#fff5e6;
-  color:#8c4f0b;
-  border-color:#ffd8a8;
-}
 .status-badge.speedup{
   background:#e8f1ff;
   color:#174ea6;
@@ -167,6 +157,14 @@ table.results{
   border-radius:10px;
   overflow:hidden;
 }
+table.results caption{
+  caption-side:top;
+  padding:0 0 .55rem;
+  color:var(--muted);
+  font-size:.92rem;
+  line-height:1.45;
+  text-align:left;
+}
 table.results th, table.results td{
   padding:9px 12px;
   border-bottom:1px solid var(--border);
@@ -182,6 +180,12 @@ table.hardware-results td{text-align:center}
 table.hardware-results td:first-child{text-align:left}
 /* Override global .results rule that left-aligns column 2 */
 table.hardware-results td:nth-child(2){text-align:center}
+table.hardware-results{
+  font-size:.88rem;
+}
+table.hardware-results th, table.hardware-results td{
+  padding:8px 10px;
+}
 .hardware-snap-grid img{
   width:100%;
   height:auto;
