@@ -99,7 +99,7 @@
     <h3>Experimental protocol</h3>
     <ul class="protocol-list">
       <li><strong>Fixed seeds:</strong> all main and ablation statistics are aggregated over 5 random seeds (seed 0-4).</li>
-      <li><strong>Evaluator settings:</strong> 50 parallel vectorized environments, 10 episodes per seed, 1000-step episode cap, and 64 action candidates for candidate-based selectors.</li>
+      <li><strong>Evaluator settings:</strong> 50 parallel vectorized environments, 10 episodes per seed, 1000-step episode cap, predictive-control horizon of 32 steps, and geometry-based candidate selection over <span class="math">\(N_{\mathrm{cand}}=64\)</span> trajectories.</li>
       <li><strong>Normalization definition:</strong> returns are reported as D4RL normalized scores from the benchmark environment API and aggregated as mean ± std across seeds.</li>
       <li><strong>Latency measurement:</strong> decision latency is measured per control step from policy decision start to selected action output; we report mean latency, p95 latency, and latency std (ms).</li>
       <li><strong>Software/hardware:</strong> experiments are executed with the CleanDiffuser evaluation pipeline on Linux using GPU-enabled PyTorch inference and MuJoCo-backed D4RL simulation.</li>
@@ -108,8 +108,9 @@
       <strong>Implementation details.</strong> Offline control benchmarks are
       evaluated in vectorized simulation with fixed protocol across methods:
       5 random seeds, 50 parallel environments per seed, 10 episodes per seed,
-      horizon cap of 1000 steps, and 64 candidate trajectories/actions for
-      candidate-based selectors.
+      horizon cap of 1000 steps, predictive horizon of 32 steps, and
+      geometry-based scoring over <span class="math">\(N_{\mathrm{cand}}=64\)</span>
+      candidate trajectories/actions.
     </div>
 
     <h3>Numerical results</h3>
@@ -301,11 +302,11 @@
     </p>
 
     <h3>Experimental setup</h3>
-    <p class="note">Physical platform and workspace used for Kinova point-to-point obstacle-avoidance trials.</p>
-    <figure class="hardware-setup-figure">
-      <img src="hardware_videos/Kinova_real-world-snapshot.png" alt="Physical robot and workspace snapshot." />
-      <figcaption>Experimental platform for real-world evaluation.</figcaption>
-    </figure>
+    <p class="note">
+      Real-world evaluation is conducted on a Kinova manipulator in a point-to-point
+      obstacle-avoidance setting with identical control interfaces for teacher and
+      student policies, fixed safety constraints, and matched goal/obstacle sampling ranges.
+    </p>
 
     <h3>Real-world quantitative results</h3>
     <div class="table-wrap">
