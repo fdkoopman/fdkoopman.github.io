@@ -98,7 +98,7 @@
     </p>
     <h3>Experimental protocol</h3>
     <ul class="protocol-list">
-      <li><strong>Seeds:</strong> 5 random seeds (0-4) for main and ablation results.</li>
+      <li><strong>Seeds:</strong> 5 random seeds (0-4) for main reported results.</li>
       <li><strong>Evaluation:</strong> 50 parallel environments, 10 episodes per seed, 1000-step cap, horizon 32, and geometry-based selection over <span class="math">\(N_{\mathrm{cand}}=64\)</span>.</li>
       <li><strong>Return:</strong> D4RL normalized score, reported as mean ± std across seeds.</li>
       <li><strong>Latency:</strong> per-control-step decision time; we report mean, p95, and std (ms).</li>
@@ -261,28 +261,6 @@
       <strong>Implementation details.</strong> Replay speed is set from measured
       decision latency; controls synchronize reset and start.
     </div>
-
-    <h3>Ablation: Number of Refinement Steps <span class="math">J</span></h3>
-    <p>
-      We vary <span class="math">J</span> in training and inference (5 seeds each).
-      <!-- <strong>Note:</strong> <span class="math">J=1</span> uses the main checkpoint;
-      <span class="math">J \in \{2,3,4\}</span> are separately re-trained students. -->
-    </p>
-    <div class="table-wrap">
-      <table class="results">
-        <thead><tr><th>Task</th><th>J</th><th>Return ↑</th><th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th></tr></thead>
-        <tbody>
-          <tr><td rowspan="4"><strong>Walker2d</strong></td><td>1</td><td>1.0973 ± 0.0002</td><td>1.75 ± 0.36</td><td>0.0004</td><td>1.0963</td></tr>
-          <tr><td>2</td><td>1.0951 ± 0.0001</td><td>3.03 ± 0.51</td><td>0.0003</td><td>1.0945</td></tr>
-          <tr><td>3</td><td>1.0977 ± 0.0002</td><td>3.24 ± 0.49</td><td>0.0004</td><td>1.0965</td></tr>
-          <tr class="ours"><td>4</td><td><strong>1.0995 ± 0.0001</strong></td><td>3.63 ± 0.41</td><td><strong>0.0002</strong></td><td><strong>1.0988</strong></td></tr>
-          <tr><td rowspan="4"><strong>HalfCheetah</strong></td><td>1</td><td><strong>0.8885 ± 0.0042</strong></td><td><strong>0.82 ± 0.47</strong></td><td><strong>0.0134</strong></td><td><strong>0.8488</strong></td></tr>
-          <tr><td>2</td><td>0.8767 ± 0.0027</td><td>0.94 ± 0.35</td><td>0.0127</td><td>0.8514</td></tr>
-          <tr><td>3</td><td>0.8178 ± 0.0012</td><td>1.10 ± 0.35</td><td>0.0180</td><td>0.7566</td></tr>
-          <tr><td>4</td><td>0.8774 ± 0.0015</td><td>1.26 ± 0.35</td><td>0.0117</td><td>0.8486</td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 </section>
 
@@ -303,98 +281,6 @@
       only the first action before replanning. Teacher and student use the same control
       interface, scene constraints, and goal-tolerance criterion to ensure a fair
       latency-performance comparison under closed-loop execution.
-    </p>
-
-    <h3>Simulation Quantitative Results (No Physics)</h3>
-    <p class="note">
-      Aggregated over 100 rollouts per setting. Here, <em>Steps</em> denotes
-      the teacher diffusion-step configuration (30/40).
-    </p>
-    <div class="table-wrap">
-      <table class="results hardware-results">
-        <caption>
-          Simulation (no-physics) quantitative results for diffusion-step settings
-          30/40 (100 rollouts per method and setting). Success is measured over
-          all rollouts with the goal-tolerance criterion
-          (<span class="math">goal\_tol \approx 0.02</span>); final goal error is
-          summarized over successful rollouts.
-        </caption>
-        <thead>
-          <tr>
-            <th>Method</th>
-            <th>Steps</th>
-            <th>Task success ↑</th>
-            <th>Completion time (s) ↓</th>
-            <th>Executed steps</th>
-            <th>Decision mean (ms) ↓</th>
-            <th>Decision p95 (ms) ↓</th>
-            <th>Final goal error ↓</th>
-            <th>Min obstacle clearance (m) ↑</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Diffusion Teacher</td>
-            <td>30</td>
-            <td>100% (100/100)</td>
-            <td>18.81 ± 2.76</td>
-            <td>145.50 ± 21.08</td>
-            <td>129.22 ± 3.17</td>
-            <td>135.13 ± 8.80</td>
-            <td>0.019389 ± 0.000361</td>
-            <td>0.024219 ± 0.025731</td>
-          </tr>
-          <tr class="ours">
-            <td><strong>Ours</strong></td>
-            <td>30</td>
-            <td><strong>92% (92/100)</strong></td>
-            <td><strong>0.20 ± 0.07</strong></td>
-            <td>267.70 ± 91.05</td>
-            <td><strong>0.46 ± 0.14</strong></td>
-            <td><strong>0.44 ± 0.02</strong></td>
-            <td>0.019565 ± 0.000313</td>
-            <td><strong>0.054168 ± 0.031460</strong></td>
-          </tr>
-          <tr>
-            <td>Diffusion Teacher</td>
-            <td>40</td>
-            <td>100% (100/100)</td>
-            <td>24.94 ± 3.69</td>
-            <td>144.47 ± 21.02</td>
-            <td>172.56 ± 3.54</td>
-            <td>176.53 ± 5.02</td>
-            <td>0.019475 ± 0.000345</td>
-            <td>0.022593 ± 0.024937</td>
-          </tr>
-          <tr class="ours">
-            <td><strong>Ours</strong></td>
-            <td>40</td>
-            <td><strong>92% (92/100)</strong></td>
-            <td><strong>0.20 ± 0.08</strong></td>
-            <td>266.47 ± 92.37</td>
-            <td><strong>0.45 ± 0.14</strong></td>
-            <td><strong>0.44 ± 0.03</strong></td>
-            <td>0.019509 ± 0.000350</td>
-            <td><strong>0.050613 ± 0.026642</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="note">
-      Trend summary: increasing diffusion steps from 30 to 40 substantially raises teacher
-      decision latency and completion time, while Ours remains in the sub-millisecond
-      decision-time regime with nearly unchanged completion time. Success is evaluated with a
-      strict terminal condition based on final goal error
-      (<span class="math">\(\lVert x_T-x_g\rVert \le \mathrm{goal\_tol}\)</span>,
-      with <span class="math">goal\_tol \approx 0.02</span> in these runs). Under this strict
-      threshold, Ours still demonstrates strong performance from a deployment perspective:
-      consistently low-latency decisions, larger average obstacle clearance, and non-colliding
-      behavior under the applied safety constraints; the remaining success-rate gap is mainly
-      attributable to threshold-level goal convergence/timing rather than unsafe motion.
-    </p>
-    <p class="note">
-      The shorter simulation completion times reflect idealized execution without hardware
-      communication delay, actuator limits, and conservative low-level tracking behavior.
     </p>
 
     <h3>Real-World Quantitative Results</h3>
