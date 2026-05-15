@@ -94,13 +94,29 @@
   <div class="container">
     <h2>Simulation Environments and Results</h2>
     <p>
-      We report results on <strong>Walker2d-medium-expert-v2</strong> and
-      <strong>HalfCheetah-medium-expert-v2</strong>.
+      We evaluate on <strong>halfcheetah-medium-expert-v2</strong> and
+      <strong>walker2d-medium-expert-v2</strong> from D4RL (MuJoCo). Both tasks use
+      observation dimension 17 and action dimension 6.
     </p>
-    <h3>Experimental protocol</h3>
+    <p>
+      Following the public <strong>CleanDiffuser</strong> evaluation pipeline, we train a
+      <em>trajectory diffusion teacher</em> together with a <em>cumulative-return classifier</em>
+      for classifier guidance during sampling and candidate ranking.
+      At inference, the teacher uses <strong>20 reverse diffusion steps</strong>.
+      Planning horizons follow the benchmark-specific defaults from that pipeline:
+      <span class="mj">\(H=4\)</span> for HalfCheetah and <span class="mj">\(H=32\)</span> for Walker2d.
+    </p>
+    <p>
+      All Koopman-family students—our dynamic model, KDM, and KDM-F—are trained on the
+      <em>same</em> teacher-generated offline distillation dataset.
+      For a fair comparison, these models share a matched training configuration:
+      latent dimension <span class="mj">\(L=512\)</span>, batch size 64, learning rate
+      <span class="mj">\(3\times10^{-4}\)</span>, and 200 training epochs.
+    </p>
+    <h3>Simulation Setup</h3>
     <ul class="protocol-list">
-      <li><strong>Seeds:</strong> 5 random seeds (0-4) for main reported results.</li>
-      <li><strong>Evaluation:</strong> 50 parallel environments, 10 episodes per seed, 1000-step cap, horizon 32, and geometry-based selection over <span class="mj">\(N_{\mathrm{cand}}=64\)</span> trajectories.</li>
+      <li><strong>Seeds:</strong> 5 random seeds (0–4) for main reported results.</li>
+      <li><strong>Evaluation:</strong> 50 parallel environments, 10 episodes per seed, 1000-step episode cap; per-task planning horizon <span class="mj">\(H=4\)</span> (HalfCheetah) or <span class="mj">\(H=32\)</span> (Walker2d); geometry-based selection over <span class="mj">\(N_{\mathrm{cand}}=64\)</span> trajectories.</li>
       <li><strong>Return:</strong> D4RL normalized score, reported as mean ± std across seeds.</li>
       <li><strong>Latency:</strong> per-control-step decision time; we report mean, p95, and std (ms).</li>
       <li><strong>Runtime stack:</strong> Linux, PyTorch GPU inference, MuJoCo/D4RL simulation.</li>
@@ -259,7 +275,8 @@
     <h3>Experimental Setup</h3>
     <p class="note">
       Hardware evaluation uses a Kinova Gen3 manipulator in a receding-horizon point-to-point obstacle-avoidance task.
-      At each step, the policy samples candidate trajectories over a finite horizon, selects among
+      We use a planning horizon of <span class="mj">\(H=32\)</span> (aligned with the Walker2d configuration above).
+      At each step, the policy samples candidate trajectories over that horizon, ranks
       <span class="mj">\(N_{\mathrm{cand}}=64\)</span> candidates with a geometry-based score, executes the first action, and replans.
       Teacher and student share the same control interface, scene constraints, and goal tolerance for a fair latency–performance comparison.
     </p>
@@ -407,6 +424,10 @@
         <figcaption>Minimum obstacle-surface clearance (mean ± std safety margin).</figcaption>
       </figure>
     </div>
+    <p class="note">
+      Aggregated over 50 trials per method, both policies achieve 100% task success with comparable terminal accuracy.
+      Ours maintains stable 80&nbsp;Hz closed-loop control with mean inference on the order of a few milliseconds per step (versus two orders of magnitude slower for the teacher), substantially reducing completion time while preserving conservative obstacle clearance—consistent with the latency and safety trends summarized in the table and plots above.
+    </p>
   </div>
 </section>
 
@@ -417,6 +438,6 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js?v=20260513"></script>
+<script src="assets/js/main.js?v=20260514"></script>
 </body>
 </html>
