@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dynamic Neural Koopman Distillation</title>
-<meta name="description" content="Dynamic Neural Koopman Distillation: one-step diffusion distillation for real-time robot control. Anonymous project page." />
+<meta name="description" content="Dynamic Neural Koopman Distillation: MuJoCo benchmarks and Kinova Gen3 receding-horizon point-to-point obstacle avoidance. Anonymous project page." />
 <link rel="stylesheet" href="assets/css/style.css" />
 <meta property="og:title" content="Dynamic Neural Koopman Distillation" />
 <meta property="og:description" content="One-step diffusion distillation for real-time robot control (anonymous project page)." />
@@ -47,7 +47,7 @@
     <p>
       Diffusion planners produce rich multi-step trajectories but their iterative inference is too slow for tight control loops.
       <em>Dynamic Neural Koopman Distillation</em> compresses multistep diffusion into a <strong>one forward pass</strong> student while keeping much of the teacher&rsquo;s multimodal structure, using a <em>Factorized Dynamic Koopman</em> layer with state-dependent modal gains.
-      On D4RL MuJoCo locomotion and a Kinova manipulator task, the student matches or improves on one-step baselines, cuts teacher latency to the <strong>millisecond</strong> range, and runs smoothly in hardware with comparable accuracy and success.
+      On D4RL MuJoCo locomotion and hardware evaluation on a <strong>Kinova Gen3</strong> manipulator in a <em>receding-horizon point-to-point obstacle-avoidance</em> task, the student matches or improves on one-step baselines, cuts teacher latency to the <strong>millisecond</strong> range, and runs smoothly in closed loop with comparable accuracy and success.
     </p>
   </div>
 </section>
@@ -234,12 +234,14 @@
 
 <section id="hardware" class="section">
   <div class="container">
-    <h2>Hardware: Kinova</h2>
-    <p class="note">Fifty independent trials per method; qualitative videos and aggregate metrics.</p>
+    <h2>Hardware evaluation (Kinova Gen3)</h2>
+    <p class="note">Fifty independent real-world trials per method (diffusion teacher vs Ours), with videos and deployment metrics.</p>
 
-    <h3>Setup</h3>
-    <p class="note">
-      Kinova Gen3, point-to-point obstacle avoidance. Planner horizon <span class="mj">\(H=32\)</span>, <span class="mj">\(N_{\mathrm{cand}}=64\)</span> geometry-ranked candidates, first action executed each cycle. Shared stack, scene, and goal tolerance for teacher vs Ours.
+    <h3>Task and protocol</h3>
+    <p>
+      Hardware evaluation uses a Kinova Gen3 manipulator in a receding-horizon point-to-point obstacle-avoidance task.
+      At each control step, the policy predicts over a horizon <span class="mj">\(H=32\)</span>, samples <span class="mj">\(N_{\mathrm{cand}}=64\)</span> candidate trajectories, ranks them with a geometry-based score, applies the first action, and replans.
+      The diffusion teacher and our one-step student share the same control interface, scene, and goal specification so latency and task performance are compared under matched conditions.
     </p>
 
     <h3>Aggregate metrics</h3>
@@ -293,7 +295,7 @@
     <p class="note">Mean ± std, 50 trials. Success = count/rate.</p>
 
     <h3>Videos</h3>
-    <p class="note">Kinova clips at 2×. Hardware pairs support synchronized play/reset.</p>
+    <p class="note">Kinova Gen3 hardware evaluation at 2× speed; paired clips support synchronized play and reset.</p>
     <div class="video-grid hardware-video-grid">
       <figure>
         <video controls muted loop playsinline preload="metadata">
@@ -330,8 +332,8 @@
         </figure>
       </div>
     </div>
-    <h3>Front view (real)</h3>
-    <p class="note">Alternate viewpoint.</p>
+    <h3>Front view (Kinova Gen3)</h3>
+    <p class="note">Second viewpoint for the same receding-horizon point-to-point obstacle-avoidance runs.</p>
     <div class="sync-demo" data-speed="2">
       <div class="latency-controls">
         <button type="button" class="btn sync-play">Play synchronized replay</button>
@@ -355,14 +357,14 @@
       </div>
     </div>
 
-    <h3>Snapshot timeline</h3>
+    <h3>Still-frame comparison (Kinova Gen3)</h3>
     <figure class="hardware-sequence-figure">
-      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion.png?v=20260508a" alt="Kinova snapshot sequence comparison between diffusion teacher and Ours." />
-      <figcaption>Teacher vs Ours (labeled times; teacher final frame <em>t=318s</em>).</figcaption>
+      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion.png?v=20260508a" alt="Still frames from Kinova Gen3 hardware evaluation: diffusion teacher vs Ours." />
+      <figcaption>Still-frame timeline from the hardware evaluation (teacher vs Ours; teacher final frame <em>t=318s</em>).</figcaption>
     </figure>
 
     <h3>Deployment metrics (50 trials)</h3>
-    <p class="note">Summary plots.</p>
+    <p class="note">Aggregates from the Kinova Gen3 hardware evaluation (same task and protocol as above).</p>
     <div class="grid-2 hardware-compare-grid">
       <figure>
         <img src="hardware_videos/Kinova_success_rate.png?v=20260507b" alt="Task success rate across 50 real-world trials for teacher and Ours." />
@@ -382,7 +384,7 @@
       </figure>
     </div>
     <p class="note">
-      In these 50 runs both methods succeed; Ours keeps mean inference ~4&nbsp;ms vs ~151&nbsp;ms for the teacher, shorter completion time, and similar clearance—see table and plots.
+      Across the 50 trials summarized above, both methods complete the point-to-point obstacle-avoidance task successfully; Ours matches similar terminal accuracy and clearance while reducing mean per-step inference to the few-millisecond range versus the teacher (see table and plots).
     </p>
   </div>
 </section>
@@ -393,6 +395,6 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js?v=20260515"></script>
+<script src="assets/js/main.js?v=20260516"></script>
 </body>
 </html>
