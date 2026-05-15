@@ -286,6 +286,8 @@ code{font-family:var(--mono);font-size:.92rem}
 pre code{color:inherit}
 
 .math{font-family:"Latin Modern Math", Cambria, Georgia, serif;font-style:italic}
+mjx-container{display:inline-block;margin:0 .05em;vertical-align:-0.15em}
+table.results mjx-container{vertical-align:middle}
 
 .note{color:var(--muted);font-size:.97rem}
 

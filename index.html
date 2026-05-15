@@ -4,10 +4,21 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dynamic Neural Koopman Distillation</title>
-<meta name="description" content="Dynamic Neural Koopman Distillation for Real-Time Robot Control Using Diffusion Models. Anonymous project page." />
+<meta name="description" content="Dynamic Neural Koopman Distillation: one-step diffusion distillation for real-time robot control. Anonymous project page." />
 <link rel="stylesheet" href="assets/css/style.css" />
 <meta property="og:title" content="Dynamic Neural Koopman Distillation" />
-<meta property="og:description" content="Real-Time Robot Control Using Diffusion Models (anonymous project page)." />
+<meta property="og:description" content="One-step diffusion distillation for real-time robot control (anonymous project page)." />
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [["\\(", "\\)"]],
+      displayMath: [["\\[", "\\]"]],
+      processEscapes: true
+    },
+    svg: { fontCache: "global" }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
 </head>
 <body>
 
@@ -34,14 +45,13 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion models excel at generating diverse and multimodal trajectories for robotic planning, yet their iterative denoising process introduces latencies that are incompatible with high-frequency closed-loop control.
+      Diffusion models excel at generating diverse and multimodal trajectories for robotic planning, yet their iterative denoising process introduces latency that is incompatible with high-frequency closed-loop control.
       To address this problem, we propose <em>Dynamic Neural Koopman Distillation</em>, a framework that distills multistep diffusion inference into a single forward pass while retaining the multimodal expressivity of the teacher model.
-      Specifically, we reformulate the denoising process as a state-dependent factorized latent transition regularized by spectral and inverse-consistency constraints.
-      To realize this formulation, we introduce a factorized dynamic Koopman-inspired layer that replaces a fixed global operator with a state-dependent factorized linear map whose latent modal gains depend on the current latent state.
+      Specifically, we introduce a <em>Factorized Dynamic Koopman</em> layer that models the denoising process through a factorized latent transition whose latent modal gains depend on the current latent state.
       We evaluate the proposed method on standard D4RL MuJoCo locomotion benchmarks and a physical Kinova manipulator, comparing against one-step baselines.
-      The results show that our method significantly outperforms existing one-step distillation approaches on the reported locomotion tasks, and reduces inference latency to the millisecond regime compared with the teacher policy.
-      Hardware experiments further demonstrate smooth and fast closed-loop execution while maintaining task success and comparable final accuracy.
-    </p> 
+      The results show that our method significantly outperforms existing one-step distillation approaches on the reported locomotion tasks, and reduces the inference latency to the millisecond regime compared with the teacher policy.
+      Hardware experiments further demonstrate that our method enables smooth and fast closed-loop execution while maintaining task success and comparable accuracy.
+    </p>
   </div>
 </section>
 
@@ -49,24 +59,22 @@
   <div class="container">
     <h2>Problem Setting</h2>
     <p>
-      We study real-time continuous-control policy distillation under offline
-      teacher supervision. The objective is to learn a one-step student policy
-      that preserves both return quality and trajectory-distribution structure
-      of a diffusion teacher while significantly reducing per-decision latency.
+      We consider trajectory generation for high-frequency closed-loop robot control.
+      Let \(\mathbf{s}_k \in \mathcal{S} \subseteq \mathbb{R}^{m}\) and \(\mathbf{a}_k \in \mathcal{A} \subseteq \mathbb{R}^{n}\)
+      denote the robot state and action at discrete time \(k\).
+      Over a prediction horizon \(H\), a future state–action trajectory is
+      \[
+        \boldsymbol{\tau} = (\mathbf{s}_1,\mathbf{a}_1,\dots,\mathbf{s}_H,\mathbf{a}_H).
+      \]
+      At each control step, the planner models a conditional trajectory distribution \(\pi(\boldsymbol{\tau}\mid \mathbf{c})\),
+      where \(\mathbf{c}\) summarizes the information available for planning (e.g., the current observation, short history, and task specification).
     </p>
     <p>
-      Let the teacher generate candidate trajectories and action selections
-      under the same state distribution. The student is optimized to reproduce
-      teacher-consistent behavior in a Koopman latent space with dynamic
-      transition refinement. Evaluation targets: normalized return, latency
-      statistics, within-run variability
-      <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and worst-case return.
+      Let \(T_{\mathrm{inf}}\) denote the time required to produce usable trajectory samples at inference, and let \(T_{\mathrm{ctrl}}\) denote the control period.
+      For closed-loop deployment, actions must be available within the control period, i.e., \(T_{\mathrm{inf}} \le T_{\mathrm{ctrl}}\).
+      Our goal is to learn a <em>one-step</em> student generator that substantially reduces \(T_{\mathrm{inf}}\) relative to a multistep diffusion teacher while preserving the teacher&rsquo;s conditional trajectory distribution as closely as possible.
+      Quantitative evaluation on MuJoCo benchmarks (return, latency, \(\sigma_{\mathrm{ep}}\), worst-case return) is reported in the simulation section below.
     </p>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Evaluation protocol: 50 parallel
-      environments, 10 episodes per seed, 64 candidate actions, and D4RL
-      normalized return as the primary task metric.
-    </div>
   </div>
 </section>
 
@@ -76,16 +84,9 @@
     <figure class="teaser">
       <img src="diagram.png" alt="Overall framework diagram" />
       <figcaption>
-        Our method distills diffusion-planner behavior into a factorized Koopman
-        student for one-step deployment while preserving trajectory diversity.
+        Dynamic Neural Koopman Distillation maps a diffusion teacher into a one-step student with a factorized dynamic Koopman transition while preserving multimodal trajectory structure.
       </figcaption>
     </figure>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> The proposed design follows a
-      factorized structure: latent Koopman transition for state evolution plus
-      a lightweight action head. Teacher supervision transfers both performance
-      and trajectory-structure priors into the student.
-    </div>
   </div>
 </section>
 
@@ -99,31 +100,27 @@
     <h3>Experimental protocol</h3>
     <ul class="protocol-list">
       <li><strong>Seeds:</strong> 5 random seeds (0-4) for main reported results.</li>
-      <li><strong>Evaluation:</strong> 50 parallel environments, 10 episodes per seed, 1000-step cap, horizon 32, and geometry-based selection over <span class="math">\(N_{\mathrm{cand}}=64\)</span>.</li>
+      <li><strong>Evaluation:</strong> 50 parallel environments, 10 episodes per seed, 1000-step cap, horizon 32, and geometry-based selection over <span class="mj">\(N_{\mathrm{cand}}=64\)</span> trajectories.</li>
       <li><strong>Return:</strong> D4RL normalized score, reported as mean ± std across seeds.</li>
       <li><strong>Latency:</strong> per-control-step decision time; we report mean, p95, and std (ms).</li>
       <li><strong>Runtime stack:</strong> Linux, PyTorch GPU inference, MuJoCo/D4RL simulation.</li>
     </ul>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> All methods share the same
-      vectorized evaluation protocol for direct comparison.
-    </div>
 
     <h3>Main Quantitative Results</h3>
     <p>
       Reported entries follow the paper table convention: mean ± standard
       deviation across 5 seeds for return and latency, with additional
       robustness metrics including
-      <span class="math">\(\sigma_{\mathrm{ep}}\)</span> (within-run episode
-      variability) and worst-case return (minimum run-level episode mean across
-      seeds). "Steps" denotes effective diffusion/decision steps at inference.
+      <span class="mj">\(\sigma_{\mathrm{ep}}\)</span> (within-run episode variability)
+      and worst-case return (minimum run-level episode mean across seeds).
+      <em>Steps</em> denotes effective diffusion or decision steps at inference.
     </p>
     <div class="table-wrap">
       <table class="results">
         <thead>
           <tr>
             <th>Env</th><th>Method</th><th>Return ↑</th><th>Steps</th>
-            <th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th>
+            <th>Latency (ms) ↓</th><th><span class="mj">\(\sigma_{\mathrm{ep}}\)</span> ↓</th><th>Worst-case Return ↑</th>
           </tr>
         </thead>
         <tbody>
@@ -170,12 +167,6 @@
         <figcaption>HalfCheetah PCA: teacher vs Ours.</figcaption>
       </figure>
     </div>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Embedded panels are sourced from
-      paper-ready figures. Quantitative tables report 5-seed
-      aggregates with best/second-best highlighting convention consistent with
-      the manuscript.
-    </div>
 
     <h3>Simulation Rollout Comparison Videos</h3>
     <p>Direct Teacher/Ours/KDM/KDM-F comparisons are shown below.</p>
@@ -186,10 +177,6 @@
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours (one-step).</strong></figcaption></figure>
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline.</figcaption></figure>
       <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline.</figcaption></figure>
-    </div>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Layout: top row = Teacher and Ours;
-      bottom row = KDM and KDM-F.
     </div>
 
     <h4>HalfCheetah-medium-expert-v2</h4>
@@ -257,10 +244,6 @@
         </figure>
       </div>
     </div>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Replay speed is set from measured
-      decision latency; controls synchronize reset and start.
-    </div>
   </div>
 </section>
 
@@ -275,12 +258,10 @@
 
     <h3>Experimental Setup</h3>
     <p class="note">
-      Hardware evaluation follows the manuscript protocol on a Kinova Gen3 manipulator
-      in a receding-horizon point-to-point obstacle-avoidance task. At each control step,
-      the policy samples candidate trajectories over a finite prediction horizon and executes
-      only the first action before replanning. Teacher and student use the same control
-      interface, scene constraints, and goal-tolerance criterion to ensure a fair
-      latency-performance comparison under closed-loop execution.
+      Hardware evaluation uses a Kinova Gen3 manipulator in a receding-horizon point-to-point obstacle-avoidance task.
+      At each step, the policy samples candidate trajectories over a finite horizon, selects among
+      <span class="mj">\(N_{\mathrm{cand}}=64\)</span> candidates with a geometry-based score, executes the first action, and replans.
+      Teacher and student share the same control interface, scene constraints, and goal tolerance for a fair latency–performance comparison.
     </p>
 
     <h3>Real-World Quantitative Results</h3>
@@ -426,11 +407,6 @@
         <figcaption>Minimum obstacle-surface clearance (mean ± std safety margin).</figcaption>
       </figure>
     </div>
-
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Hardware reporting is limited to
-      Teacher vs Ours with consistent trial aggregation.
-    </div>
   </div>
 </section>
 
@@ -441,6 +417,6 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js?v=20260508b"></script>
+<script src="assets/js/main.js?v=20260513"></script>
 </body>
 </html>
