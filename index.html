@@ -45,9 +45,22 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion planners produce rich multi-step trajectories but their iterative inference is too slow for tight control loops.
-      <em>Dynamic Neural Koopman Distillation</em> compresses multistep diffusion into a <strong>one forward pass</strong> student while keeping much of the teacher&rsquo;s multimodal structure, using a <em>Factorized Dynamic Koopman</em> layer with state-dependent modal gains.
-      On D4RL MuJoCo locomotion and hardware evaluation on a <strong>Kinova Gen3</strong> manipulator in a <em>receding-horizon point-to-point obstacle-avoidance</em> task, the student matches or improves on one-step baselines, cuts teacher latency to the <strong>millisecond</strong> range, and runs smoothly in closed loop with comparable accuracy and success.
+      Diffusion models excel at generating diverse and multimodal trajectories for robotic planning, yet their iterative denoising process introduces latency that is incompatible with high-frequency closed-loop control.
+    </p>
+    <p>
+      To address this problem, we propose <em>Dynamic Neural Koopman Distillation</em>, a framework that distills multistep diffusion inference into a single forward pass while retaining the multimodal expressivity of the teacher model.
+    </p>
+    <p>
+      Specifically, we introduce a <em>Factorized Dynamic Koopman</em> layer that models the denoising process through a factorized latent transition with state-dependent modal gains.
+    </p>
+    <p>
+      We evaluate the proposed method on standard D4RL MuJoCo locomotion benchmarks and a physical Kinova manipulator, comparing against one-step baselines.
+    </p>
+    <p>
+      The results show that our method significantly outperforms existing one-step distillation approaches on the reported locomotion tasks, and reduces the inference latency to the millisecond regime compared with the teacher policy. Hardware experiments further demonstrate that our method enables smooth and fast closed-loop execution while maintaining task success and comparable accuracy.
+    </p>
+    <p>
+      A project page is available at <a href="https://fdkoopman.github.io/">https://fdkoopman.github.io/</a>.
     </p>
   </div>
 </section>
