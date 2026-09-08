@@ -115,7 +115,44 @@
     reset();
   }
 
+  function setupRolloutDemo(root) {
+    const videos = Array.from(root.querySelectorAll(".rollout-video"));
+    const playBtn = root.querySelector(".sync-play");
+    const resetBtn = root.querySelector(".reset-playback");
+    const speed = Number(root.dataset.speed || "1");
+    if (!videos.length || !playBtn || !resetBtn) return;
+
+    function applyRate() {
+      videos.forEach((video) => {
+        video.playbackRate = speed;
+        video.defaultPlaybackRate = speed;
+      });
+    }
+
+    function reset() {
+      videos.forEach((video) => {
+        video.pause();
+        video.currentTime = 0;
+      });
+      applyRate();
+    }
+
+    async function syncPlay() {
+      reset();
+      try {
+        await Promise.all(videos.map((video) => video.play()));
+      } catch (_) {
+        // Keep manual controls available if autoplay is restricted.
+      }
+    }
+
+    playBtn.addEventListener("click", syncPlay);
+    resetBtn.addEventListener("click", reset);
+    reset();
+  }
+
   document.querySelectorAll(".latency-demo").forEach(setupLatencyDemo);
   document.querySelectorAll(".sync-demo").forEach(setupSyncDemo);
+  document.querySelectorAll(".rollout-demo").forEach(setupRolloutDemo);
   setupHardwareRolloutPlayback();
 })();

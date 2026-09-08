@@ -3,29 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dynamic Neural Koopman Distillation</title>
-<meta name="description" content="Dynamic Neural Koopman Distillation: MuJoCo benchmarks and Kinova Gen3 receding-horizon point-to-point obstacle avoidance. Anonymous project page." />
+<title>Factorized Koopman Distillation</title>
+<meta name="description" content="Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models. Anonymous project page (IEEE RA-L, double-blind review)." />
 <link rel="stylesheet" href="assets/css/style.css" />
-<meta property="og:title" content="Dynamic Neural Koopman Distillation" />
-<meta property="og:description" content="One-step diffusion distillation for real-time robot control (anonymous project page)." />
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [["\\(", "\\)"]],
-      displayMath: [["\\[", "\\]"]],
-      processEscapes: true
-    },
-    svg: { fontCache: "global" }
-  };
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
+<meta property="og:title" content="Factorized Koopman Distillation" />
+<meta property="og:description" content="Real-Time Robot Control from Diffusion Models (anonymous project page)." />
 </head>
 <body>
 
 <header class="hero">
   <div class="container">
-    <h1 class="title">Dynamic Neural Koopman Distillation</h1>
-    <p class="subtitle">Real-Time Robot Control Using Diffusion Models</p>
+    <h1 class="title">Factorized Koopman Distillation</h1>
+    <p class="subtitle">Real-Time Robot Control from Diffusion Models</p>
     <p class="authors">Anonymous Author(s)</p>
     <p class="affil">Affiliation withheld for double-blind review</p>
     <nav class="hero-links">
@@ -33,10 +22,10 @@
       <a class="btn disabled" aria-disabled="true">arXiv</a>
       <a class="btn disabled" aria-disabled="true">Code</a> -->
       <a class="btn" href="#abstract">Abstract</a>
-      <a class="btn" href="#problem">Problem Setting</a>
-      <a class="btn" href="#framework">Framework</a>
-      <a class="btn" href="#simulation">Simulation Results</a>
+      <a class="btn" href="#simulation">Simulation Environments</a>
+      <a class="btn" href="#simulation">Numerical Results</a>
       <a class="btn" href="#hardware">Hardware</a>
+      <a class="btn" href="#bibtex">BibTeX</a>
     </nav>
   </div>
 </header>
@@ -45,85 +34,99 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion models excel at generating diverse and multimodal trajectories for robotic planning, yet their iterative denoising process introduces latency that is incompatible with high-frequency closed-loop control.
-    </p>
-    <p>
-      To address this problem, we propose <em>Dynamic Neural Koopman Distillation</em>, a framework that distills multistep diffusion inference into a single forward pass while retaining the multimodal expressivity of the teacher model.
-    </p>
-    <p>
-      Specifically, we introduce a <em>Factorized Dynamic Koopman</em> layer that models the denoising process through a factorized latent transition with state-dependent modal gains.
-    </p>
-    <p>
-      We evaluate the proposed method on standard D4RL MuJoCo locomotion benchmarks and a physical Kinova manipulator, comparing against one-step baselines.
-    </p>
-    <p>
-      The results show that our method significantly outperforms existing one-step distillation approaches on the reported locomotion tasks, and reduces the inference latency to the millisecond regime compared with the teacher policy. Hardware experiments further demonstrate that our method enables smooth and fast closed-loop execution while maintaining task success and comparable accuracy.
+      Diffusion models excel at generating diverse, multimodal trajectories for robotic planning, yet their iterative denoising process introduces latencies that are incompatible with high-frequency closed-loop control. 
+      In this paper, we propose <em>Dynamic Neural Koopman Distillation</em>, a framework that distills multistep diffusion inference into a single forward pass while retaining the teacher model's multimodal expressivity. Specifically, 
+      we reformulate the denoising process as a state-dependent factorized latent transition regularized by spectral and inverse-consistency constraints. To realize this formulation, we introduce a Factorized Dynamic Koopman layer 
+      that replaces a fixed global operator with a state-dependent factorized linear map whose latent modal gains depend on the current latent state. 
+      We evaluate the proposed method on standard D4RL MuJoCo locomotion benchmarks and a physical Kinova manipulator, comparing against consistency-based one-step baselines and static Koopman distillation baselines. 
+      Results show that the proposed approach achieves the highest normalized returns among the one-step baselines and attains teacher-level performance on the reported locomotion tasks. 
+      It also reduces inference latency to the millisecond regime, yielding substantial speedups over the teacher in the reported control settings. 
     </p> 
   </div>
 </section>
 
 <section id="problem" class="section alt">
   <div class="container">
-    <h2>Problem Setting</h2>
+    <h2>Problem setting</h2>
     <p>
-      We consider trajectory generation for high-frequency closed-loop robot control.
-      Let \(\mathbf{s}_k \in \mathcal{S} \subseteq \mathbb{R}^{m}\) and \(\mathbf{a}_k \in \mathcal{A} \subseteq \mathbb{R}^{n}\)
-      denote the robot state and action at discrete time \(k\).
-      Over a prediction horizon \(H\), a future state–action trajectory is
-      \[
-        \boldsymbol{\tau} = (\mathbf{s}_1,\mathbf{a}_1,\dots,\mathbf{s}_H,\mathbf{a}_H).
-      \]
-      At each control step, the planner models a conditional trajectory distribution \(\pi(\boldsymbol{\tau}\mid \mathbf{c})\),
-      where \(\mathbf{c}\) summarizes the information available for planning (e.g., the current observation, short history, and task specification).
+      We study real-time continuous-control policy distillation under offline
+      teacher supervision. The objective is to learn a one-step student policy
+      that preserves both return quality and trajectory-distribution structure
+      of a diffusion teacher while significantly reducing per-decision latency.
     </p>
     <p>
-      Let \(T_{\mathrm{inf}}\) denote the time required to produce usable trajectory samples at inference, and let \(T_{\mathrm{ctrl}}\) denote the control period.
-      For closed-loop deployment, actions must be available within the control period, i.e., \(T_{\mathrm{inf}} \le T_{\mathrm{ctrl}}\).
-      Our goal is a <em>one-step</em> student that cuts \(T_{\mathrm{inf}}\) versus a multistep diffusion teacher while tracking the teacher&rsquo;s conditional trajectory distribution.
-      MuJoCo results below report return, latency, \(\sigma_{\mathrm{ep}}\), and worst-case return.
+      Let the teacher generate candidate trajectories and action selections
+      under the same state distribution. The student is optimized to reproduce
+      teacher-consistent behavior in a Koopman latent space with dynamic
+      transition refinement. Evaluation targets: normalized return, latency
+      statistics, within-run variability
+      <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and worst-case return.
     </p>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Evaluation protocol: 50 parallel
+      environments, 10 episodes per seed, 64 candidate actions, and D4RL
+      normalized return as the primary task metric.
+    </div>
   </div>
 </section>
 
 <section id="framework" class="section">
   <div class="container">
-    <h2>Overall Framework</h2>
+    <h2>Overall framework</h2>
     <figure class="teaser">
-      <img src="diagram.png?v=20260515" alt="Overall framework diagram" />
+      <img src="diagram.png" alt="Overall framework diagram" />
       <figcaption>
-        High-level view: diffusion teacher trajectories are distilled into a fast one-step Koopman student.
+        FKD distills diffusion-planner behavior into a factorized Koopman
+        student for one-step deployment while preserving trajectory diversity.
       </figcaption>
     </figure>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> The FKD design follows a
+      factorized structure: latent Koopman transition for state evolution plus
+      a lightweight action head. Teacher supervision transfers both performance
+      and trajectory-structure priors into the student.
+    </div>
   </div>
 </section>
 
 <section id="simulation" class="section alt">
   <div class="container">
-    <h2>Simulation Environments and Results</h2>
+    <h2>Simulation environments</h2>
     <p>
-      <strong>halfcheetah-medium-expert-v2</strong> and <strong>walker2d-medium-expert-v2</strong> (D4RL MuJoCo; 17-dim observations, 6-dim actions).
-      Teacher training and inference follow the public <strong>CleanDiffuser</strong> recipe: trajectory diffusion plus a return classifier for guided sampling and candidate ranking, with <strong>20</strong> denoising steps at rollout time.
+      We report results on <strong>Walker2d-medium-expert-v2</strong> and
+      <strong>HalfCheetah-medium-expert-v2</strong>.
     </p>
-    <h3>Simulation Setup</h3>
+    <h3>Experimental protocol</h3>
     <ul class="protocol-list">
-      <li><strong>Seeds:</strong> 5 random seeds (0–4) for main reported results.</li>
-      <li><strong>Evaluation:</strong> 50 parallel environments, 10 episodes per seed, 1000-step episode cap; per-task planning horizon <span class="mj">\(H=4\)</span> (HalfCheetah) or <span class="mj">\(H=32\)</span> (Walker2d); geometry-based selection over <span class="mj">\(N_{\mathrm{cand}}=64\)</span> trajectories.</li>
-      <li><strong>Return:</strong> D4RL normalized score, reported as mean ± std across seeds.</li>
-      <li><strong>Latency:</strong> per-control-step decision time; we report mean, p95, and std (ms).</li>
-      <li><strong>Runtime stack:</strong> Linux, PyTorch GPU inference, MuJoCo/D4RL simulation.</li>
+      <li><strong>Fixed seeds:</strong> all main and ablation statistics are aggregated over 5 random seeds (seed 0-4).</li>
+      <li><strong>Evaluator settings:</strong> 50 parallel vectorized environments, 10 episodes per seed, 1000-step episode cap, and 64 action candidates for candidate-based selectors.</li>
+      <li><strong>Normalization definition:</strong> returns are reported as D4RL normalized scores from the benchmark environment API and aggregated as mean ± std across seeds.</li>
+      <li><strong>Latency measurement:</strong> decision latency is measured per control step from policy decision start to selected action output; we report mean latency, p95 latency, and latency std (ms).</li>
+      <li><strong>Software/hardware:</strong> experiments are executed with the CleanDiffuser evaluation pipeline on Linux using GPU-enabled PyTorch inference and MuJoCo-backed D4RL simulation.</li>
     </ul>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Offline control benchmarks are
+      evaluated in vectorized simulation with fixed protocol across methods:
+      5 random seeds, 50 parallel environments per seed, 10 episodes per seed,
+      horizon cap of 1000 steps, and 64 candidate trajectories/actions for
+      candidate-based selectors.
+    </div>
 
-    <h3>Main Quantitative Results</h3>
-    <p class="note">
-      Mean ± std over 5 seeds. <span class="mj">\(\sigma_{\mathrm{ep}}\)</span> = within-run episode variability; worst-case return = minimum seed-level episode mean.
-      <em>Steps</em> = diffusion (teacher) or decision (student) steps at inference.
+    <h3>Numerical results</h3>
+    <p>
+      Reported entries follow the paper table convention: mean ± standard
+      deviation across 5 seeds for return and latency, with additional
+      robustness metrics including
+      <span class="math">\(\sigma_{\mathrm{ep}}\)</span> (within-run episode
+      variability) and worst-case return (minimum run-level episode mean across
+      seeds). "Steps" denotes effective diffusion/decision steps at inference.
     </p>
     <div class="table-wrap">
       <table class="results">
         <thead>
           <tr>
             <th>Env</th><th>Method</th><th>Return ↑</th><th>Steps</th>
-            <th>Latency (ms) ↓</th><th><span class="mj">\(\sigma_{\mathrm{ep}}\)</span> ↓</th><th>Worst-case Return ↑</th>
+            <th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th>
           </tr>
         </thead>
         <tbody>
@@ -132,67 +135,83 @@
           <tr><td>CT</td><td>0.4404 ± 0.0096</td><td>1</td><td>1.09 ± 2.37</td><td>0.0659</td><td>0.2591</td></tr>
           <tr><td>KDM</td><td>0.6057 ± 0.0156</td><td>1</td><td><strong>0.35 ± 0.04</strong></td><td>0.0333</td><td>0.5925</td></tr>
           <tr><td>KDM-F</td><td>0.3386 ± 0.0070</td><td>1</td><td>0.87 ± 0.03</td><td>0.0380</td><td>0.3267</td></tr>
-          <tr class="ours"><td><strong>Ours</strong></td><td><strong>1.0973 ± 0.0002</strong></td><td>1</td><td>1.75 ± 0.36</td><td><strong>0.0004</strong></td><td><strong>1.0963</strong></td></tr>
-          <tr><td>Ours (classifier selector)</td><td>1.0285 ± 0.0022</td><td>1</td><td>4.57 ± 0.87</td><td>0.0242</td><td>0.9677</td></tr>
+          <tr class="ours"><td><strong>Ours</strong></td><td><strong>1.0946 ± 0.0001</strong></td><td>1</td><td>1.67 ± 0.42</td><td><strong>0.0005</strong></td><td><strong>1.0934</strong></td></tr>
+          <tr><td>Ours (classifier)</td><td>1.0285 ± 0.0022</td><td>1</td><td>4.57 ± 0.87</td><td>0.0242</td><td>0.9677</td></tr>
           <tr><td rowspan="7"><strong>HalfCheetah</strong></td><td>Diffusion Teacher</td><td>0.8518 ± 0.0032</td><td>20</td><td>116.51 ± 2.39</td><td><u>0.0114</u></td><td>0.8229</td></tr>
           <tr><td>CD</td><td>0.4027 ± 0.0109</td><td>1</td><td>1.08 ± 2.32</td><td>0.0277</td><td>0.3217</td></tr>
           <tr><td>CT</td><td>0.4089 ± 0.0047</td><td>1</td><td>1.08 ± 2.31</td><td>0.0198</td><td>0.3663</td></tr>
           <tr><td>KDM</td><td>0.6618 ± 0.0045</td><td>1</td><td><strong>0.34 ± 0.03</strong></td><td>0.0349</td><td>0.6571</td></tr>
           <tr><td>KDM-F</td><td>0.4852 ± 0.0098</td><td>1</td><td>0.86 ± 0.03</td><td>0.0216</td><td>0.4659</td></tr>
-          <tr class="ours"><td><strong>Ours</strong></td><td><strong>0.8885 ± 0.0042</strong></td><td>1</td><td><u>0.82 ± 0.47</u></td><td>0.0134</td><td><strong>0.8488</strong></td></tr>
-          <tr><td>Ours (classifier selector)</td><td><u>0.8599 ± 0.0010</u></td><td>1</td><td>1.83 ± 0.80</td><td><strong>0.0081</strong></td><td><u>0.8417</u></td></tr>
+          <tr class="ours"><td><strong>Ours</strong></td><td><strong>0.8772 ± 0.0042</strong></td><td>1</td><td><u>0.68 ± 0.39</u></td><td>0.0134</td><td><strong>0.8386</strong></td></tr>
+          <tr><td>Ours (classifier)</td><td><u>0.8599 ± 0.0010</u></td><td>1</td><td>1.83 ± 0.80</td><td><strong>0.0081</strong></td><td><u>0.8417</u></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">
-      CD / CT: consistency-style one-step baselines. KDM / KDM-F: static Koopman distillation (factorized variant). <strong>Ours</strong>: proposed dynamic student.
-    </p>
 
-    <h3>Latency, Pareto curves, and PCA</h3>
+    <h3>Paper figures: latency-performance and PCA</h3>
     <div class="grid-2 paper-fig-grid">
       <figure>
         <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure." />
-        <figcaption>Walker2d: latency vs return (Pareto-style view).</figcaption>
+        <figcaption>Walker2d latency-performance Pareto (paper figure).</figcaption>
       </figure>
       <figure>
         <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure." />
-        <figcaption>HalfCheetah: latency vs return.</figcaption>
+        <figcaption>HalfCheetah latency-performance Pareto (paper figure).</figcaption>
       </figure>
       <figure>
         <img src="assets/img/pca_teacher_vs_ours_walker2d.png" alt="Walker2d PCA teacher vs Ours." />
-        <figcaption>Walker2d: PCA of teacher vs Ours.</figcaption>
+        <figcaption>Walker2d PCA: teacher vs Ours.</figcaption>
       </figure>
       <figure>
         <img src="assets/img/pca_teacher_vs_ours_halfcheetah.png" alt="HalfCheetah PCA teacher vs Ours." />
-        <figcaption>HalfCheetah: PCA of teacher vs Ours.</figcaption>
+        <figcaption>HalfCheetah PCA: teacher vs Ours.</figcaption>
       </figure>
     </div>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Embedded panels are sourced from
+      the uploaded paper-ready figures. Quantitative tables report 5-seed
+      aggregates with best/second-best highlighting convention consistent with
+      the manuscript.
+    </div>
 
-    <h3>Rollout videos</h3>
-    <p class="note">Teacher, Ours, KDM, KDM-F.</p>
+    <h3>Simulation rollout comparison videos</h3>
+    <p>
+      Side-by-side rollouts for Teacher, Ours, KDM, and KDM-F on each benchmark.
+    </p>
 
     <h4>Walker2d-medium-expert-v2</h4>
-    <div class="video-grid">
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_diffusion.mp4" type="video/mp4" /></video><figcaption>Diffusion Teacher (20-step).</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours (one-step).</strong></figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline.</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline.</figcaption></figure>
+    <div class="rollout-demo" data-speed="1">
+      <div class="rollout-controls">
+        <button type="button" class="btn sync-play">Play</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid video-grid-4">
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
+      </div>
     </div>
 
     <h4>HalfCheetah-medium-expert-v2</h4>
-    <div class="video-grid">
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Diffusion Teacher (20-step).</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours (one-step).</strong></figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM baseline.</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F baseline.</figcaption></figure>
+    <div class="video-grid video-grid-4">
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
+      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
     </div>
 
-    <h3>Latency-scaled replay</h3>
-    <p class="note">Playback speeds are scaled by measured mean decision latency so the teacher&rsquo;s slower inference is visible next to the student.</p>
+    <h3>Online latency-aware replay (teacher vs student)</h3>
+    <p>
+      To reflect deployment-time latency, we provide synchronized replay where
+      playback speed is adjusted by measured decision latency. In this mode,
+      the teacher stream is slowed according to the teacher/student latency
+      ratio, making the real-time responsiveness gap visually explicit.
+    </p>
 
-    <div class="latency-demo" data-env="Walker2d" data-teacher-ms="301.22" data-student-ms="1.75">
+    <div class="latency-demo" data-env="Walker2d" data-teacher-ms="301.22" data-student-ms="1.67">
       <div class="latency-head">
-        <h4>Walker2d</h4>
+        <h4>Walker2d: online replay with latency scaling</h4>
         <p class="latency-meta"></p>
       </div>
       <div class="latency-controls">
@@ -215,9 +234,9 @@
       </div>
     </div>
 
-    <div class="latency-demo" data-env="HalfCheetah" data-teacher-ms="116.51" data-student-ms="0.82">
+    <div class="latency-demo" data-env="HalfCheetah" data-teacher-ms="116.51" data-student-ms="0.68">
       <div class="latency-head">
-        <h4>HalfCheetah</h4>
+        <h4>HalfCheetah: online replay with latency scaling</h4>
         <p class="latency-meta"></p>
       </div>
       <div class="latency-controls">
@@ -239,172 +258,147 @@
         </figure>
       </div>
     </div>
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Replay scaling uses measured
+      decision-time means. Teacher playback rate is inversely proportional to
+      the teacher/student latency ratio, while student playback remains at
+      real-time speed; controls synchronize reset and start events.
+    </div>
+
+    <h3>Ablation: number of refinement steps <span class="math">J</span></h3>
+    <p>
+      We vary <span class="math">J</span> in training and inference (5 seeds each).
+      <!-- <strong>Note:</strong> <span class="math">J=1</span> uses the main checkpoint;
+      <span class="math">J \in \{2,3,4\}</span> are separately re-trained students. -->
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead><tr><th>Task</th><th>J</th><th>Return ↑</th><th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4"><strong>Walker2d</strong></td><td>1</td><td>1.0946 ± 0.0001</td><td>1.67 ± 0.42</td><td>0.0005</td><td>1.0934</td></tr>
+          <tr><td>2</td><td>1.0951 ± 0.0001</td><td>3.03 ± 0.51</td><td>0.0003</td><td>1.0945</td></tr>
+          <tr><td>3</td><td>1.0977 ± 0.0002</td><td>3.24 ± 0.49</td><td>0.0004</td><td>1.0965</td></tr>
+          <tr class="ours"><td>4</td><td><strong>1.0995 ± 0.0001</strong></td><td>3.63 ± 0.41</td><td><strong>0.0002</strong></td><td><strong>1.0988</strong></td></tr>
+          <tr><td rowspan="4"><strong>HalfCheetah</strong></td><td>1</td><td>0.8772 ± 0.0042</td><td><strong>0.68 ± 0.39</strong></td><td>0.0134</td><td>0.8386</td></tr>
+          <tr><td>2</td><td>0.8767 ± 0.0027</td><td>0.94 ± 0.35</td><td>0.0127</td><td>0.8514</td></tr>
+          <tr><td>3</td><td>0.8178 ± 0.0012</td><td>1.10 ± 0.35</td><td>0.0180</td><td>0.7566</td></tr>
+          <tr class="ours"><td>4</td><td><strong>0.8774 ± 0.0015</strong></td><td>1.26 ± 0.35</td><td><strong>0.0117</strong></td><td><strong>0.8486</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
 <section id="hardware" class="section">
   <div class="container">
-    <h2>Hardware evaluation (Kinova Gen3)</h2>
-    <p class="note">Fifty independent real-world trials per method (diffusion teacher vs Ours), with videos and deployment metrics.</p>
-
-    <h3>Task and protocol</h3>
+    <h2>Hardware: Teacher vs Ours</h2>
     <p>
-      Hardware evaluation uses a Kinova Gen3 manipulator in a receding-horizon point-to-point obstacle-avoidance task.
-      At each control step, the policy predicts over a horizon <span class="mj">\(H=32\)</span>, samples <span class="mj">\(N_{\mathrm{cand}}=64\)</span> candidate trajectories, ranks them with a geometry-based score, applies the first action, and replans.
-      The diffusion teacher and our one-step student share the same control interface, scene, and goal specification so latency and task performance are compared under matched conditions.
+      On the physical Kinova manipulator, we compare the diffusion teacher and our
+      one-step distilled policy under the same task specification, replanning pipeline,
+      and low-level controller (50 trials per method).
     </p>
 
-    <h3>Aggregate metrics</h3>
+    <h3>Experimental setup</h3>
+    <figure class="hardware-setup-figure">
+      <img src="hardware_videos/Kinova_real-world-snapshot.png" alt="Physical robot and workspace snapshot." />
+      <figcaption>Kinova Gen3 obstacle-aware reconfiguration task in the real-world setup.</figcaption>
+    </figure>
+
+    <h3>Real-world quantitative results</h3>
     <div class="table-wrap">
       <table class="results hardware-results">
         <thead>
           <tr>
-            <th>Method</th>
-            <th>Task completion ↑</th>
-            <th>Task success ↑</th>
-            <th>Completion time (s) ↓</th>
-            <th>Executed steps</th>
-            <th>Inference mean (ms) ↓</th>
-            <th>Inference p95 (ms) ↓</th>
-            <th>Final goal error ↓</th>
-            <th>Min obstacle clearance (m) ↑</th>
-            <th>Measured control Hz ↑</th>
-            <th>Overrun ratio ↓</th>
+            <th>Metric</th>
+            <th>Diffusion Teacher</th>
+            <th>Ours</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Diffusion Teacher</td>
-            <td>1.0000 ± 0.0000</td>
-            <td>100% (50/50)</td>
-            <td>314.95 ± 3.54</td>
-            <td>25195.62 ± 283.24</td>
-            <td>151.00 ± 3.73</td>
-            <td>158.27 ± 3.78</td>
-            <td>0.003093 ± 0.001421</td>
-            <td>0.046289 ± 0.012908</td>
-            <td>80.005 ± 0.025</td>
-            <td>0.5013 ± 0.0251</td>
-          </tr>
-          <tr class="ours">
-            <td><strong>Ours</strong></td>
-            <td><strong>1.0000 ± 0.0000</strong></td>
-            <td><strong>100% (50/50)</strong></td>
-            <td><strong>85.43 ± 2.53</strong></td>
-            <td>6834.24 ± 202.67</td>
-            <td><strong>4.08 ± 0.20</strong></td>
-            <td><strong>4.73 ± 0.23</strong></td>
-            <td>0.003458 ± 0.001745</td>
-            <td><strong>0.048953 ± 0.012117</strong></td>
-            <td>79.999 ± 0.019</td>
-            <td>0.5020 ± 0.0245</td>
-          </tr>
+          <tr><td>Mean inference latency (ms) ↓</td><td>151.00 ± 3.73</td><td><strong>4.08 ± 0.20</strong></td></tr>
+          <tr><td>P95 inference latency (ms) ↓</td><td>158.27 ± 3.78</td><td><strong>4.73 ± 0.23</strong></td></tr>
+          <tr><td>Completion time (s) ↓</td><td>314.95 ± 3.54</td><td><strong>85.43 ± 2.53</strong></td></tr>
+          <tr><td>Terminal error (mm) ↓</td><td><strong>3.09 ± 1.42</strong></td><td>3.46 ± 1.75</td></tr>
+          <tr><td>Minimum clearance (mm) ↑</td><td>46.29 ± 12.91</td><td><strong>48.95 ± 12.12</strong></td></tr>
+          <tr><td>Success rate (%) ↑</td><td><strong>100.0</strong></td><td><strong>100.0</strong></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">Mean ± std, 50 trials. Success = count/rate.</p>
 
-    <h3>Videos</h3>
-    <p class="note">Kinova Gen3 hardware evaluation at 2× speed; paired clips support synchronized play and reset.</p>
-    <div class="video-grid hardware-video-grid">
+    <h3>Rollout videos</h3>
+    <div class="video-grid video-grid-4 hardware-video-grid">
       <figure>
         <video controls muted loop playsinline preload="metadata">
-          <source src="sim_videos/sim_teacher_diffusion.mp4" type="video/mp4" />
+          <source src="hardware_videos/Kinova_teacher_real_world.mp4" type="video/mp4" />
         </video>
-        <figcaption>Diffusion Teacher (simulation).</figcaption>
+        <figcaption>Teacher (real-world).</figcaption>
       </figure>
       <figure>
         <video controls muted loop playsinline preload="metadata">
-          <source src="sim_videos/sim_student_koopman.mp4" type="video/mp4" />
+          <source src="hardware_videos/Kinova_student_real_world.mp4" type="video/mp4" />
+        </video>
+        <figcaption><strong>Ours</strong> (real-world).</figcaption>
+      </figure>
+      <figure>
+        <video controls muted loop playsinline preload="metadata">
+          <source src="hardware_videos/Kinova_simulation_teacher_rollout_video.mp4" type="video/mp4" />
+        </video>
+        <figcaption>Teacher (simulation).</figcaption>
+      </figure>
+      <figure>
+        <video controls muted loop playsinline preload="metadata">
+          <source src="hardware_videos/Kinova_simulation_student_rollout_video.mp4" type="video/mp4" />
         </video>
         <figcaption><strong>Ours</strong> (simulation).</figcaption>
       </figure>
     </div>
-    <div class="sync-demo" data-speed="2">
-      <div class="latency-controls">
-        <button type="button" class="btn sync-play">Play synchronized replay</button>
-        <button type="button" class="btn reset-playback">Reset</button>
-      </div>
-      <div class="video-grid hardware-video-grid">
-        <figure>
-          <span class="status-badge speedup">2x Speed</span>
-          <video class="teacher-video realworld-speedup" controls muted loop playsinline preload="metadata">
-            <source src="hardware_videos/Kinova_teacher_real_world.mp4" type="video/mp4" />
-          </video>
-          <figcaption>Diffusion Teacher (real-world side view, 2x replay).</figcaption>
-        </figure>
-        <figure>
-          <span class="status-badge speedup">2x Speed</span>
-          <video class="student-video realworld-speedup" controls muted loop playsinline preload="metadata">
-            <source src="hardware_videos/Kinova_student_real_world.mp4" type="video/mp4" />
-          </video>
-          <figcaption><strong>Ours</strong> (real-world side view, 2x replay).</figcaption>
-        </figure>
-      </div>
-    </div>
-    <h3>Front view (Kinova Gen3)</h3>
-    <p class="note">Second viewpoint for the same receding-horizon point-to-point obstacle-avoidance runs.</p>
-    <div class="sync-demo" data-speed="2">
-      <div class="latency-controls">
-        <button type="button" class="btn sync-play">Play synchronized replay</button>
-        <button type="button" class="btn reset-playback">Reset</button>
-      </div>
-      <div class="video-grid hardware-video-grid">
-        <figure>
-          <span class="status-badge speedup">2x Speed</span>
-          <video class="teacher-video realworld-speedup" controls muted loop playsinline preload="metadata">
-            <source src="hardware_videos/Kinova_front_teacher_real_world.mp4?v=20260512" type="video/mp4" />
-          </video>
-          <figcaption>Diffusion Teacher (real-world front view, 2x replay).</figcaption>
-        </figure>
-        <figure>
-          <span class="status-badge speedup">2x Speed</span>
-          <video class="student-video realworld-speedup" controls muted loop playsinline preload="metadata">
-            <source src="hardware_videos/Kinova_front_student_real_world.mp4?v=20260512" type="video/mp4" />
-          </video>
-          <figcaption><strong>Ours</strong> (real-world front view, 2x replay).</figcaption>
-        </figure>
-      </div>
-    </div>
-
-    <h3>Still-frame comparison (Kinova Gen3)</h3>
+    <h3>Snapshot sequence comparison</h3>
+    <p class="note">Both rows use identical wall-clock timestamps (<code>t = 10, 25, 40, 60, 85</code> s). At <code>t = 85</code> s, ours completes the task while the diffusion teacher is still oscillating near the obstacle.</p>
     <figure class="hardware-sequence-figure">
-      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion.png?v=20260508a" alt="Still frames from Kinova Gen3 hardware evaluation: diffusion teacher vs Ours." />
-      <figcaption>Still-frame timeline from the hardware evaluation (teacher vs Ours; teacher final frame <em>t=318s</em>).</figcaption>
+      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion_aligned.png" alt="Kinova snapshot sequence comparison across planning methods (aligned timestamps)." />
+      <figcaption>Matched wall-clock snapshots from a representative Kinova rollout. The teacher shows slow motion and repeated oscillation; ours replans quickly and completes the task within the same time budget.</figcaption>
     </figure>
 
-    <h3>Deployment metrics (50 trials)</h3>
-    <p class="note">Aggregates from the Kinova Gen3 hardware evaluation (same task and protocol as above).</p>
+    <h3>Simulation vs hardware comparison</h3>
     <div class="grid-2 hardware-compare-grid">
       <figure>
-        <img src="hardware_videos/Kinova_success_rate.png?v=20260507b" alt="Task success rate across 50 real-world trials for teacher and Ours." />
-        <figcaption>Task success rate across 50 real-world trials.</figcaption>
+        <img src="hardware_videos/Kinova_success_rate.png" alt="Comparison of success rate in simulation and hardware." />
+        <figcaption>Success rate comparison (simulation vs hardware).</figcaption>
       </figure>
       <figure>
-        <img src="hardware_videos/Kinova_completion_time.png?v=20260507b" alt="Task completion time mean and standard deviation across real-world trials." />
-        <figcaption>Task completion time (mean ± std, 50 real-world trials).</figcaption>
-      </figure>
-      <figure>
-        <img src="hardware_videos/Kinova_inference_latency.png?v=20260507b" alt="Inference latency per control step showing mean and p95 for both methods." />
-        <figcaption>Inference latency per control step (mean and p95 across trials).</figcaption>
-      </figure>
-      <figure>
-        <img src="hardware_videos/Kinova_safety_clearance.png?v=20260507b" alt="Minimum obstacle-surface clearance mean and standard deviation across real-world trials." />
-        <figcaption>Minimum obstacle-surface clearance (mean ± std safety margin).</figcaption>
+        <img src="hardware_videos/Kinova_completion_time.png" alt="Comparison of completion time in simulation and hardware." />
+        <figcaption>Completion time comparison (simulation vs hardware).</figcaption>
       </figure>
     </div>
-    <p class="note">
-      Across the 50 trials summarized above, both methods complete the point-to-point obstacle-avoidance task successfully; Ours matches similar terminal accuracy and clearance while reducing mean per-step inference to the few-millisecond range versus the teacher (see table and plots).
-    </p>
+
+    <div class="impl-details">
+      <strong>Implementation details.</strong> Hardware evaluation uses 50 trials per method with
+      20&nbsp;Hz Cartesian control, 30-step teacher denoising, horizon 32, and 64 ranked candidates.
+      Simulation and real-world rollout videos are shown side by side for teacher vs. ours.
+    </div>
   </div>
 </section>
 
+<!-- <section id="bibtex" class="section alt">
+  <div class="container">
+    <h2>BibTeX</h2>
+<pre><code>@article{anonymous2026fkd,
+  title   = {Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models},
+  author  = {Anonymous},
+  journal = {},
+  year    = {2026},
+  note    = {Double-blind review; author information withheld}
+}</code></pre>
+  </div>
+</section> -->
+
 <footer class="footer">
   <div class="container">
-    <p>Anonymous supplementary page for double-blind review.</p>
+    <p>Anonymous project page for double-blind peer review.</p>
+    <p>No identifying information is disclosed on this page or repository history.</p>
   </div>
 </footer>
 
-<script src="assets/js/main.js?v=20260516"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
