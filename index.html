@@ -130,18 +130,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td rowspan="8"><strong>Walker2d</strong></td><td>Diffusion Teacher</td><td><u>1.0295 ± 0.0051</u></td><td>20</td><td>301.22 ± 2.41</td><td><u>0.0193</u></td><td><u>0.9759</u></td></tr>
+          <tr><td rowspan="7"><strong>Walker2d</strong></td><td>Diffusion Teacher</td><td><u>1.0295 ± 0.0051</u></td><td>20</td><td>301.22 ± 2.41</td><td><u>0.0193</u></td><td><u>0.9759</u></td></tr>
           <tr><td>CD</td><td>0.6144 ± 0.0176</td><td>1</td><td>1.09 ± 2.33</td><td>0.0577</td><td>0.4808</td></tr>
           <tr><td>CT</td><td>0.4404 ± 0.0096</td><td>1</td><td>1.09 ± 2.37</td><td>0.0659</td><td>0.2591</td></tr>
-          <tr><td>Consistency Policy</td><td>1.0605 ± 0.0050</td><td>1</td><td>1.11 ± 0.07</td><td>0.0128</td><td>1.0118</td></tr>
           <tr><td>KDM</td><td>0.6057 ± 0.0156</td><td>1</td><td><strong>0.35 ± 0.04</strong></td><td>0.0333</td><td>0.5925</td></tr>
           <tr><td>KDM-F</td><td>0.3386 ± 0.0070</td><td>1</td><td>0.87 ± 0.03</td><td>0.0380</td><td>0.3267</td></tr>
           <tr class="ours"><td><strong>Ours</strong></td><td><strong>1.0946 ± 0.0001</strong></td><td>1</td><td>1.67 ± 0.42</td><td><strong>0.0005</strong></td><td><strong>1.0934</strong></td></tr>
           <tr><td>Ours (classifier)</td><td>1.0711 ± 0.0081</td><td>1</td><td>4.32 ± 0.95</td><td>0.0157</td><td>1.0172</td></tr>
-          <tr><td rowspan="8"><strong>HalfCheetah</strong></td><td>Diffusion Teacher</td><td>0.8518 ± 0.0032</td><td>20</td><td>116.51 ± 2.39</td><td><u>0.0114</u></td><td>0.8229</td></tr>
+          <tr><td rowspan="7"><strong>HalfCheetah</strong></td><td>Diffusion Teacher</td><td>0.8518 ± 0.0032</td><td>20</td><td>116.51 ± 2.39</td><td><u>0.0114</u></td><td>0.8229</td></tr>
           <tr><td>CD</td><td>0.4027 ± 0.0109</td><td>1</td><td>1.08 ± 2.32</td><td>0.0277</td><td>0.3217</td></tr>
           <tr><td>CT</td><td>0.4089 ± 0.0047</td><td>1</td><td>1.08 ± 2.31</td><td>0.0198</td><td>0.3663</td></tr>
-          <tr><td>Consistency Policy</td><td>0.7044 ± 0.0063</td><td>1</td><td>2.03 ± 0.11</td><td>0.0348</td><td>0.6217</td></tr>
           <tr><td>KDM</td><td>0.6618 ± 0.0045</td><td>1</td><td><strong>0.34 ± 0.03</strong></td><td>0.0349</td><td>0.6571</td></tr>
           <tr><td>KDM-F</td><td>0.4852 ± 0.0098</td><td>1</td><td>0.86 ± 0.03</td><td>0.0216</td><td>0.4659</td></tr>
           <tr class="ours"><td><strong>Ours</strong></td><td><strong>0.8772 ± 0.0042</strong></td><td>1</td><td><u>0.68 ± 0.39</u></td><td>0.0134</td><td><strong>0.8386</strong></td></tr>
@@ -152,19 +150,18 @@
 
     <h3>Paper figures: latency-performance and PCA</h3>
     <p>
-      Return versus recorded decision latency (log scale). Consistency Policy (CP) is our
-      D4RL adaptation of the visuomotor consistency distillation baseline; bars show return
-      standard deviation across five evaluation seeds. Timing scopes differ across methods;
+      Return versus recorded decision latency (log scale). Bars show return standard
+      deviation across five evaluation seeds. Timing scopes differ across methods;
       see implementation note below.
     </p>
     <div class="grid-2 paper-fig-grid">
       <figure>
-        <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure including Consistency Policy." />
-        <figcaption>Walker2d: normalized return vs. recorded latency (Teacher, CD, CT, CP, KDM, KDM-F, Ours).</figcaption>
+        <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure." />
+        <figcaption>Walker2d: normalized return vs. recorded latency.</figcaption>
       </figure>
       <figure>
-        <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure including Consistency Policy." />
-        <figcaption>HalfCheetah: normalized return vs. recorded latency (Teacher, CD, CT, CP, KDM, KDM-F, Ours).</figcaption>
+        <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure." />
+        <figcaption>HalfCheetah: normalized return vs. recorded latency.</figcaption>
       </figure>
       <figure>
         <img src="assets/img/pca_teacher_vs_ours_walker2d.png" alt="Walker2d PCA teacher vs Ours." />
@@ -176,28 +173,25 @@
       </figure>
     </div>
     <div class="impl-details">
-      <strong>Implementation details.</strong> Pareto panels include Consistency Policy (CP;
-      D4RL adaptation, IQL@64). CD, CT, CP, and Ours (IQL) use Protocol A; KDM/KDM-F use
-      Protocol B (one candidate, no selector). CP timing includes preprocessing, input transfer,
-      sampling, IQL selection, and output transfer; our DNK timer excludes preprocessing, prior
-      generation, and selected-action output transfer. These are descriptive comparisons, not
-      matched end-to-end speedup measurements.
+      <strong>Implementation details.</strong> CD, CT, and Ours (IQL) use Protocol A (IQL@64);
+      KDM/KDM-F use Protocol B (one candidate, no selector). Recorded timing scopes differ
+      across methods; these are descriptive comparisons, not matched end-to-end speedup
+      measurements.
     </div>
 
     <h3>Simulation rollout comparison videos</h3>
     <p>
-      Side-by-side rollouts for Teacher, Consistency Policy, Ours, KDM, and KDM-F on each benchmark.
+      Side-by-side rollouts for Teacher, Ours, KDM, and KDM-F on each benchmark.
     </p>
 
     <h4>Walker2d-medium-expert-v2</h4>
-    <div class="rollout-demo" data-speed="1">
+    <div class="rollout-demo" data-speed="1" id="rollout-walker2d">
       <div class="rollout-controls">
-        <button type="button" class="btn sync-play">Play</button>
-        <button type="button" class="btn reset-playback">Reset</button>
+        <button type="button" class="btn rollout-play">Play</button>
+        <button type="button" class="btn rollout-reset">Reset</button>
       </div>
-      <div class="video-grid video-grid-5">
+      <div class="video-grid video-grid-4">
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
-        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_consistency_policy.mp4" type="video/mp4" /></video><figcaption>Consistency Policy</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
@@ -205,14 +199,13 @@
     </div>
 
     <h4>HalfCheetah-medium-expert-v2</h4>
-    <div class="rollout-demo" data-speed="1">
+    <div class="rollout-demo" data-speed="1" id="rollout-halfcheetah">
       <div class="rollout-controls">
-        <button type="button" class="btn sync-play">Play</button>
-        <button type="button" class="btn reset-playback">Reset</button>
+        <button type="button" class="btn rollout-play">Play</button>
+        <button type="button" class="btn rollout-reset">Reset</button>
       </div>
-      <div class="video-grid video-grid-5">
+      <div class="video-grid video-grid-4">
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
-        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_consistency_policy.mp4" type="video/mp4" /></video><figcaption>Consistency Policy</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
