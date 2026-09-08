@@ -117,8 +117,8 @@
 
   function setupRolloutDemo(root) {
     const videos = Array.from(root.querySelectorAll(".rollout-video"));
-    const playBtn = root.querySelector(".rollout-play");
-    const resetBtn = root.querySelector(".rollout-reset");
+    const playBtn = root.querySelector(".sync-play");
+    const resetBtn = root.querySelector(".reset-playback");
     const speed = Number(root.dataset.speed || "1");
     if (!videos.length || !playBtn || !resetBtn) return;
 
