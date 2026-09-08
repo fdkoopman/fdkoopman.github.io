@@ -198,7 +198,7 @@
       <div class="video-grid video-grid-5">
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
-        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_consistency_policy.mp4" type="video/mp4" /></video><figcaption>Consistency Policy</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_consistency_policy.mp4" type="video/mp4" /></video><figcaption>CP</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
       </div>
@@ -213,7 +213,7 @@
       <div class="video-grid video-grid-5">
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
-        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_consistency_policy.mp4" type="video/mp4" /></video><figcaption>Consistency Policy</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_consistency_policy.mp4" type="video/mp4" /></video><figcaption>CP</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
       </div>
@@ -338,7 +338,6 @@
           <tr><td>Completion time (s) ↓</td><td>314.95 ± 3.54</td><td><strong>85.43 ± 2.53</strong></td></tr>
           <tr><td>Terminal error (mm) ↓</td><td><strong>3.09 ± 1.42</strong></td><td>3.46 ± 1.75</td></tr>
           <tr><td>Minimum clearance (mm) ↑</td><td>46.29 ± 12.91</td><td><strong>48.95 ± 12.12</strong></td></tr>
-          <tr><td>Success rate (%) ↑</td><td><strong>100.0</strong></td><td><strong>100.0</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -378,16 +377,10 @@
     </figure>
 
     <h3>Simulation vs hardware comparison</h3>
-    <div class="grid-2 hardware-compare-grid">
-      <figure>
-        <img src="hardware_videos/Kinova_success_rate.png" alt="Comparison of success rate in simulation and hardware." />
-        <figcaption>Success rate comparison (simulation vs hardware).</figcaption>
-      </figure>
-      <figure>
-        <img src="hardware_videos/Kinova_completion_time.png" alt="Comparison of completion time in simulation and hardware." />
-        <figcaption>Completion time comparison (simulation vs hardware).</figcaption>
-      </figure>
-    </div>
+    <figure class="hardware-setup-figure">
+      <img src="hardware_videos/Kinova_completion_time.png" alt="Comparison of completion time in simulation and hardware." />
+      <figcaption>Completion time comparison (simulation vs hardware).</figcaption>
+    </figure>
 
     <div class="impl-details">
       <strong>Implementation details.</strong> Hardware evaluation uses 50 trials per method with
