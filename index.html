@@ -195,15 +195,9 @@
         <button type="button" class="btn sync-play">Play</button>
         <button type="button" class="btn reset-playback">Reset</button>
       </div>
-      <div class="video-grid video-grid-4">
+      <div class="video-grid video-grid-5">
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
-        <figure>
-          <video class="rollout-video" controls muted loop playsinline preload="metadata" aria-label="Consistency Policy rollout on Walker2d">
-            <source src="assets/videos/walker2d_consistency_policy.mp4" type="video/mp4" />
-            <a href="assets/videos/walker2d_consistency_policy.mp4">Download the Walker2d Consistency Policy video</a>.
-          </video>
-          <figcaption>Consistency Policy (one-step; D4RL adaptation).</figcaption>
-        </figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_consistency_policy.mp4" type="video/mp4" /></video><figcaption>Consistency Policy</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/walker2d_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
@@ -211,18 +205,18 @@
     </div>
 
     <h4>HalfCheetah-medium-expert-v2</h4>
-    <div class="video-grid video-grid-4">
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
-      <figure>
-        <video controls muted loop playsinline preload="metadata" aria-label="Consistency Policy rollout on HalfCheetah">
-          <source src="assets/videos/halfcheetah_consistency_policy.mp4" type="video/mp4" />
-          <a href="assets/videos/halfcheetah_consistency_policy.mp4">Download the HalfCheetah Consistency Policy video</a>.
-        </video>
-        <figcaption>Consistency Policy (one-step; D4RL adaptation).</figcaption>
-      </figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
-      <figure><video controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
+    <div class="rollout-demo" data-speed="1">
+      <div class="rollout-controls">
+        <button type="button" class="btn sync-play">Play</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid video-grid-5">
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_diffusion.mp4" type="video/mp4" /></video><figcaption>Teacher</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_consistency_policy.mp4" type="video/mp4" /></video><figcaption>Consistency Policy</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_koopman.mp4" type="video/mp4" /></video><figcaption><strong>Ours</strong></figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
+        <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
+      </div>
     </div>
 
     <h3>Online latency-aware replay (teacher vs student)</h3>
