@@ -343,31 +343,67 @@
     </div>
 
     <h3>Rollout videos</h3>
-    <div class="video-grid video-grid-4 hardware-video-grid">
+    <p class="note">Kinova Gen3 hardware evaluation at 2× speed; paired clips support synchronized play and reset.</p>
+    <div class="video-grid hardware-video-grid">
       <figure>
         <video controls muted loop playsinline preload="metadata">
-          <source src="hardware_videos/Kinova_teacher_real_world.mp4" type="video/mp4" />
+          <source src="sim_videos/sim_teacher_diffusion.mp4" type="video/mp4" />
         </video>
-        <figcaption>Teacher (real-world).</figcaption>
+        <figcaption>Diffusion Teacher (simulation).</figcaption>
       </figure>
       <figure>
         <video controls muted loop playsinline preload="metadata">
-          <source src="hardware_videos/Kinova_student_real_world.mp4" type="video/mp4" />
-        </video>
-        <figcaption><strong>Ours</strong> (real-world).</figcaption>
-      </figure>
-      <figure>
-        <video controls muted loop playsinline preload="metadata">
-          <source src="hardware_videos/Kinova_simulation_teacher_rollout_video.mp4" type="video/mp4" />
-        </video>
-        <figcaption>Teacher (simulation).</figcaption>
-      </figure>
-      <figure>
-        <video controls muted loop playsinline preload="metadata">
-          <source src="hardware_videos/Kinova_simulation_student_rollout_video.mp4" type="video/mp4" />
+          <source src="sim_videos/sim_student_koopman.mp4" type="video/mp4" />
         </video>
         <figcaption><strong>Ours</strong> (simulation).</figcaption>
       </figure>
+    </div>
+    <div class="sync-demo" data-speed="2">
+      <div class="latency-controls">
+        <button type="button" class="btn sync-play">Play synchronized replay</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid hardware-video-grid">
+        <figure>
+          <span class="status-badge speedup">2x Speed</span>
+          <video class="teacher-video realworld-speedup" controls muted loop playsinline preload="metadata">
+            <source src="hardware_videos/Kinova_teacher_real_world.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Diffusion Teacher (real-world side view, 2x replay).</figcaption>
+        </figure>
+        <figure>
+          <span class="status-badge speedup">2x Speed</span>
+          <video class="student-video realworld-speedup" controls muted loop playsinline preload="metadata">
+            <source src="hardware_videos/Kinova_student_real_world.mp4" type="video/mp4" />
+          </video>
+          <figcaption><strong>Ours</strong> (real-world side view, 2x replay).</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <h4>Front view (Kinova Gen3)</h4>
+    <p class="note">Second viewpoint for the same receding-horizon point-to-point obstacle-avoidance runs.</p>
+    <div class="sync-demo" data-speed="2">
+      <div class="latency-controls">
+        <button type="button" class="btn sync-play">Play synchronized replay</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid hardware-video-grid">
+        <figure>
+          <span class="status-badge speedup">2x Speed</span>
+          <video class="teacher-video realworld-speedup" controls muted loop playsinline preload="metadata">
+            <source src="hardware_videos/Kinova_front_teacher_real_world.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Diffusion Teacher (real-world front view, 2x replay).</figcaption>
+        </figure>
+        <figure>
+          <span class="status-badge speedup">2x Speed</span>
+          <video class="student-video realworld-speedup" controls muted loop playsinline preload="metadata">
+            <source src="hardware_videos/Kinova_front_student_real_world.mp4" type="video/mp4" />
+          </video>
+          <figcaption><strong>Ours</strong> (real-world front view, 2x replay).</figcaption>
+        </figure>
+      </div>
     </div>
     <h3>Snapshot sequence comparison</h3>
     <p class="note">Both rows use identical wall-clock timestamps (<code>t = 10, 25, 40, 60, 85</code> s). At <code>t = 85</code> s, ours completes the task while the diffusion teacher is still oscillating near the obstacle.</p>
@@ -385,7 +421,8 @@
     <div class="impl-details">
       <strong>Implementation details.</strong> Hardware evaluation uses 50 trials per method with
       20&nbsp;Hz Cartesian control, 30-step teacher denoising, horizon 32, and 64 ranked candidates.
-      Simulation and real-world rollout videos are shown side by side for teacher vs. ours.
+      Simulation rollouts use the no-physics Kinova task setting; real-world clips replay at 2× speed
+      with synchronized play/reset for side and front views.
     </div>
   </div>
 </section>
