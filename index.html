@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Factorized Koopman Distillation</title>
-<meta name="description" content="Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models. Anonymous project page (IEEE RA-L, double-blind review)." />
+<title>Dynamic Neural Koopman Distillation for Fast Robot Control Using Diffusion Models</title>
+<meta name="description" content="Dynamic Neural Koopman Distillation for Fast Robot Control Using Diffusion Models. Anonymous project page (IEEE RA-L, double-blind review)." />
 <link rel="stylesheet" href="assets/css/style.css" />
-<meta property="og:title" content="Factorized Koopman Distillation" />
-<meta property="og:description" content="Real-Time Robot Control from Diffusion Models (anonymous project page)." />
+<meta property="og:title" content="Dynamic Neural Koopman Distillation for Fast Robot Control Using Diffusion Models" />
+<meta property="og:description" content="One-step Dynamic Neural Koopman distillation of diffusion policies for real-time robot control (anonymous project page)." />
 </head>
 <body>
 
 <header class="hero">
   <div class="container">
-    <h1 class="title">Factorized Koopman Distillation</h1>
-    <p class="subtitle">Real-Time Robot Control from Diffusion Models</p>
+    <h1 class="title">Dynamic Neural Koopman Distillation</h1>
+    <p class="subtitle">for Fast Robot Control Using Diffusion Models</p>
     <p class="authors">Anonymous Author(s)</p>
     <p class="affil">Affiliation withheld for double-blind review</p>
     <nav class="hero-links">
@@ -34,13 +34,7 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion models excel at generating diverse, multimodal trajectories for robotic planning, yet their iterative denoising process introduces latencies that are incompatible with high-frequency closed-loop control. 
-      In this paper, we propose <em>Dynamic Neural Koopman Distillation</em>, a framework that distills multistep diffusion inference into a single forward pass while retaining the teacher model's multimodal expressivity. Specifically, 
-      we reformulate the denoising process as a state-dependent factorized latent transition regularized by spectral and inverse-consistency constraints. To realize this formulation, we introduce a Factorized Dynamic Koopman layer 
-      that replaces a fixed global operator with a state-dependent factorized linear map whose latent modal gains depend on the current latent state. 
-      We evaluate the proposed method on standard D4RL MuJoCo locomotion benchmarks and a physical Kinova manipulator, comparing against consistency-based one-step baselines and static Koopman distillation baselines. 
-      Results show that the proposed approach achieves the highest normalized returns among the one-step baselines and attains teacher-level performance on the reported locomotion tasks. 
-      It also reduces inference latency to the millisecond regime, yielding substantial speedups over the teacher in the reported control settings. 
+      Diffusion models excel at generating diverse, multimodal trajectories and action sequences for robotic control, yet their iterative denoising process introduces latency that can constrain real-time closed-loop execution. To address this problem, we propose a Dynamic Neural Koopman (DNK) distillation framework, which distills multistep diffusion inference into a single forward pass conditioned on observations and sampled noise. Specifically, we introduce a Factorized Dynamic Koopman (FDK) layer that models the denoising process through a latent linear transition. The noisy trajectory input is lifted into a latent space, where the FDK layer parameterizes a factorized linear operator with condition-dependent eigenvalues that adapt the noisy-to-denoised transition to the current context. We evaluate DNK across robot-control benchmarks that span locomotion, state-based, and image-based manipulation, comparing against accelerated generative-policy baselines. The results demonstrate that one-step DNK outperforms accelerated generative-policy baselines in most evaluated settings while retaining teacher-comparable performance at millisecond-scale inference latency. On long-horizon manipulation tasks, DNK achieves competitive performance with substantially fewer inference parameters than the one-step policy baselines. Hardware experiments on a physical Kinova manipulator further demonstrate millisecond-scale inference and reduced task completion time.
     </p> 
   </div>
 </section>
@@ -76,15 +70,16 @@
     <figure class="teaser">
       <img src="diagram.png" alt="Overall framework diagram" />
       <figcaption>
-        FKD distills diffusion-planner behavior into a factorized Koopman
+        DNK distills diffusion-planner behavior into a dynamic neural Koopman
         student for one-step deployment while preserving trajectory diversity.
       </figcaption>
     </figure>
     <div class="impl-details">
-      <strong>Implementation details.</strong> The FKD design follows a
-      factorized structure: latent Koopman transition for state evolution plus
-      a lightweight action head. Teacher supervision transfers both performance
-      and trajectory-structure priors into the student.
+      <strong>Implementation details.</strong> The DNK design uses an FDK
+      layer: a factorized latent Koopman transition whose eigenvalues depend
+      on the current context, plus a lightweight action head. Teacher
+      supervision transfers both performance and trajectory-structure priors
+      into the student.
     </div>
   </div>
 </section>
@@ -114,74 +109,40 @@
 
     <h3>Numerical results</h3>
     <p>
-      Reported entries follow the paper table convention: mean ± standard
-      deviation across 5 seeds for return and latency, with additional
-      robustness metrics including
-      <span class="math">\(\sigma_{\mathrm{ep}}\)</span> (within-run episode
-      variability) and worst-case return (minimum run-level episode mean across
-      seeds). "Steps" denotes effective diffusion/decision steps at inference.
+      Quantitative comparison results on D4RL locomotion tasks.
+      <em>T<sub>D</sub></em> and <em>T<sub>E</sub></em> denote task-specific
+      DDPM and EDM teachers, respectively. CT has no pretrained diffusion
+      teacher. Bold marks the best displayed one-step student value on each task.
     </p>
     <div class="table-wrap">
       <table class="results">
         <thead>
           <tr>
-            <th>Env</th><th>Method</th><th>Return ↑</th><th>Steps</th>
-            <th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th>
+            <th>Task</th><th>Method</th>
+            <th>Return ↑</th><th>Latency (ms) ↓</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td rowspan="8"><strong>Walker2d</strong></td><td>Diffusion Teacher</td><td><u>1.0295 ± 0.0051</u></td><td>20</td><td>301.22 ± 2.41</td><td><u>0.0193</u></td><td><u>0.9759</u></td></tr>
-          <tr><td>CD</td><td>0.6144 ± 0.0176</td><td>1</td><td>1.09 ± 2.33</td><td>0.0577</td><td>0.4808</td></tr>
-          <tr><td>CT</td><td>0.4404 ± 0.0096</td><td>1</td><td>1.09 ± 2.37</td><td>0.0659</td><td>0.2591</td></tr>
-          <tr><td>Consistency Policy</td><td>1.0605 ± 0.0050</td><td>1</td><td>1.11 ± 0.07</td><td>0.0128</td><td>1.0118</td></tr>
-          <tr><td>KDM</td><td>0.6057 ± 0.0156</td><td>1</td><td><strong>0.35 ± 0.04</strong></td><td>0.0333</td><td>0.5925</td></tr>
-          <tr><td>KDM-F</td><td>0.3386 ± 0.0070</td><td>1</td><td>0.87 ± 0.03</td><td>0.0380</td><td>0.3267</td></tr>
-          <tr class="ours"><td><strong>Ours</strong></td><td><strong>1.0946 ± 0.0001</strong></td><td>1</td><td>1.67 ± 0.42</td><td><strong>0.0005</strong></td><td><strong>1.0934</strong></td></tr>
-          <tr><td>Ours (classifier)</td><td>1.0711 ± 0.0081</td><td>1</td><td>4.32 ± 0.95</td><td>0.0157</td><td>1.0172</td></tr>
-          <tr><td rowspan="8"><strong>HalfCheetah</strong></td><td>Diffusion Teacher</td><td>0.8518 ± 0.0032</td><td>20</td><td>116.51 ± 2.39</td><td><u>0.0114</u></td><td>0.8229</td></tr>
-          <tr><td>CD</td><td>0.4027 ± 0.0109</td><td>1</td><td>1.08 ± 2.32</td><td>0.0277</td><td>0.3217</td></tr>
-          <tr><td>CT</td><td>0.4089 ± 0.0047</td><td>1</td><td>1.08 ± 2.31</td><td>0.0198</td><td>0.3663</td></tr>
-          <tr><td>Consistency Policy</td><td>0.7044 ± 0.0063</td><td>1</td><td>2.03 ± 0.11</td><td>0.0348</td><td>0.6217</td></tr>
-          <tr><td>KDM</td><td>0.6618 ± 0.0045</td><td>1</td><td><strong>0.34 ± 0.03</strong></td><td>0.0349</td><td>0.6571</td></tr>
-          <tr><td>KDM-F</td><td>0.4852 ± 0.0098</td><td>1</td><td>0.86 ± 0.03</td><td>0.0216</td><td>0.4659</td></tr>
-          <tr class="ours"><td><strong>Ours</strong></td><td><strong>0.8772 ± 0.0042</strong></td><td>1</td><td><u>0.68 ± 0.39</u></td><td>0.0134</td><td><strong>0.8386</strong></td></tr>
-          <tr><td>Ours (classifier)</td><td>0.8676 ± 0.0021</td><td>1</td><td>2.97 ± 0.86</td><td><strong>0.0092</strong></td><td><u>0.8422</u></td></tr>
+          <tr><td rowspan="9"><strong>HalfCheetah</strong></td><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>0.867 ± 0.004</td><td>36.94 ± 0.63</td></tr>
+          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>0.842 ± 0.012</td><td>6.72 ± 0.02</td></tr>
+          <tr><td>CD (<em>T<sub>E</sub></em>)</td><td>0.428 ± 0.013</td><td>1.08 ± 2.32</td></tr>
+          <tr><td>CT</td><td>0.403 ± 0.025</td><td>1.08 ± 2.31</td></tr>
+          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>0.676 ± 0.012</td><td>2.03 ± 0.11</td></tr>
+          <tr><td>OneDP-S</td><td>0.748 ± 0.030</td><td>2.03 ± 0.11</td></tr>
+          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>0.553 ± 0.024</td><td>0.34 ± 0.03</td></tr>
+          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>0.510 ± 0.004</td><td>0.86 ± 0.03</td></tr>
+          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>0.873 ± 0.007</strong></td><td><strong>0.68 ± 0.39</strong></td></tr>
+          <tr><td rowspan="9"><strong>Walker2d</strong></td><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>1.109 ± 0.000</td><td>49.65 ± 0.12</td></tr>
+          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>1.108 ± 0.001</td><td>6.67 ± 0.01</td></tr>
+          <tr><td>CD (<em>T<sub>E</sub></em>)</td><td>0.689 ± 0.010</td><td>1.09 ± 2.33</td></tr>
+          <tr><td>CT</td><td>0.387 ± 0.017</td><td>1.09 ± 2.37</td></tr>
+          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>1.059 ± 0.013</td><td>1.11 ± 0.07</td></tr>
+          <tr><td>OneDP-S (<em>T<sub>D</sub></em>)</td><td>1.105 ± 0.000</td><td>2.03 ± 0.11</td></tr>
+          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>0.620 ± 0.011</td><td>0.35 ± 0.04</td></tr>
+          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>0.396 ± 0.066</td><td>0.87 ± 0.03</td></tr>
+          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>1.095 ± 0.001</strong></td><td><strong>0.60 ± 0.42</strong></td></tr>
         </tbody>
       </table>
-    </div>
-
-    <h3>Paper figures: latency-performance and PCA</h3>
-    <p>
-      Return versus recorded decision latency (log scale). Consistency Policy (CP) is our
-      D4RL adaptation of the visuomotor consistency distillation baseline; bars show return
-      standard deviation across five evaluation seeds. Timing scopes differ across methods;
-      see implementation note below.
-    </p>
-    <div class="grid-2 paper-fig-grid">
-      <figure>
-        <img src="assets/img/pareto_walker2d.png" alt="Walker2d latency-performance Pareto figure including Consistency Policy." />
-        <figcaption>Walker2d: normalized return vs. recorded latency (Teacher, CD, CT, CP, KDM, KDM-F, Ours).</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/img/pareto_halfcheetah.png" alt="HalfCheetah latency-performance Pareto figure including Consistency Policy." />
-        <figcaption>HalfCheetah: normalized return vs. recorded latency (Teacher, CD, CT, CP, KDM, KDM-F, Ours).</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/img/pca_teacher_vs_ours_walker2d.png" alt="Walker2d PCA teacher vs Ours." />
-        <figcaption>Walker2d PCA: teacher vs Ours.</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/img/pca_teacher_vs_ours_halfcheetah.png" alt="HalfCheetah PCA teacher vs Ours." />
-        <figcaption>HalfCheetah PCA: teacher vs Ours.</figcaption>
-      </figure>
-    </div>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> Pareto panels include Consistency Policy (CP;
-      D4RL adaptation, IQL@64). CD, CT, CP, and Ours (IQL) use Protocol A; KDM/KDM-F use
-      Protocol B (one candidate, no selector). CP timing includes preprocessing, input transfer,
-      sampling, IQL selection, and output transfer; our DNK timer excludes preprocessing, prior
-      generation, and selected-action output transfer. These are descriptive comparisons, not
-      matched end-to-end speedup measurements.
     </div>
 
     <h3>Simulation rollout comparison videos</h3>
@@ -227,7 +188,7 @@
       ratio, making the real-time responsiveness gap visually explicit.
     </p>
 
-    <div class="latency-demo" data-env="Walker2d" data-teacher-ms="301.22" data-student-ms="1.67">
+    <div class="latency-demo" data-env="Walker2d" data-teacher-ms="49.65" data-student-ms="0.60">
       <div class="latency-head">
         <h4>Walker2d: online replay with latency scaling</h4>
         <p class="latency-meta"></p>
@@ -252,7 +213,7 @@
       </div>
     </div>
 
-    <div class="latency-demo" data-env="HalfCheetah" data-teacher-ms="116.51" data-student-ms="0.68">
+    <div class="latency-demo" data-env="HalfCheetah" data-teacher-ms="36.94" data-student-ms="0.68">
       <div class="latency-head">
         <h4>HalfCheetah: online replay with latency scaling</h4>
         <p class="latency-meta"></p>
@@ -293,11 +254,11 @@
       <table class="results">
         <thead><tr><th>Task</th><th>J</th><th>Return ↑</th><th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th></tr></thead>
         <tbody>
-          <tr><td rowspan="4"><strong>Walker2d</strong></td><td>1</td><td>1.0946 ± 0.0001</td><td>1.67 ± 0.42</td><td>0.0005</td><td>1.0934</td></tr>
+          <tr><td rowspan="4"><strong>Walker2d</strong></td><td>1</td><td>1.095 ± 0.001</td><td>0.60 ± 0.42</td><td>0.0005</td><td>1.0934</td></tr>
           <tr><td>2</td><td>1.0951 ± 0.0001</td><td>3.03 ± 0.51</td><td>0.0003</td><td>1.0945</td></tr>
           <tr><td>3</td><td>1.0977 ± 0.0002</td><td>3.24 ± 0.49</td><td>0.0004</td><td>1.0965</td></tr>
           <tr class="ours"><td>4</td><td><strong>1.0995 ± 0.0001</strong></td><td>3.63 ± 0.41</td><td><strong>0.0002</strong></td><td><strong>1.0988</strong></td></tr>
-          <tr><td rowspan="4"><strong>HalfCheetah</strong></td><td>1</td><td>0.8772 ± 0.0042</td><td><strong>0.68 ± 0.39</strong></td><td>0.0134</td><td>0.8386</td></tr>
+          <tr><td rowspan="4"><strong>HalfCheetah</strong></td><td>1</td><td>0.873 ± 0.007</td><td><strong>0.68 ± 0.39</strong></td><td>0.0134</td><td>0.8386</td></tr>
           <tr><td>2</td><td>0.8767 ± 0.0027</td><td>0.94 ± 0.35</td><td>0.0127</td><td>0.8514</td></tr>
           <tr><td>3</td><td>0.8178 ± 0.0012</td><td>1.10 ± 0.35</td><td>0.0180</td><td>0.7566</td></tr>
           <tr class="ours"><td>4</td><td><strong>0.8774 ± 0.0015</strong></td><td>1.26 ± 0.35</td><td><strong>0.0117</strong></td><td><strong>0.8486</strong></td></tr>
@@ -405,18 +366,35 @@
         </figure>
       </div>
     </div>
-    <h3>Snapshot sequence comparison</h3>
-    <p class="note">Both rows use identical wall-clock timestamps (<code>t = 10, 25, 40, 60, 85</code> s). At <code>t = 85</code> s, ours completes the task while the diffusion teacher is still oscillating near the obstacle.</p>
+    <h3>Still-frame comparison (Kinova Gen3)</h3>
     <figure class="hardware-sequence-figure">
-      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion_aligned.png" alt="Kinova snapshot sequence comparison across planning methods (aligned timestamps)." />
-      <figcaption>Matched wall-clock snapshots from a representative Kinova rollout. The teacher shows slow motion and repeated oscillation; ours replans quickly and completes the task within the same time budget.</figcaption>
+      <img src="hardware_videos/Kinova_snapshots_sequence_comparasion_original.png" alt="Still frames from Kinova Gen3 hardware evaluation: diffusion teacher vs Ours." />
+      <figcaption>Representative rollout timelines from the hardware evaluation. The diffusion teacher reaches success at <em>t=318</em>&nbsp;s after slow motion and oscillation near the obstacle; Ours completes at <em>t=86</em>&nbsp;s with faster replanning through the narrow passage.</figcaption>
     </figure>
 
-    <h3>Simulation vs hardware comparison</h3>
-    <figure class="hardware-setup-figure">
-      <img src="hardware_videos/Kinova_completion_time.png" alt="Comparison of completion time in simulation and hardware." />
-      <figcaption>Completion time comparison (simulation vs hardware).</figcaption>
-    </figure>
+    <h3>Deployment metrics (50 trials)</h3>
+    <p class="note">Aggregates from the Kinova Gen3 hardware evaluation (same task and protocol as above).</p>
+    <div class="grid-2 hardware-compare-grid">
+      <figure>
+        <img src="hardware_videos/Kinova_success_rate.png" alt="Task success rate across 50 real-world trials for teacher and Ours." />
+        <figcaption>Task success rate across 50 real-world trials.</figcaption>
+      </figure>
+      <figure>
+        <img src="hardware_videos/Kinova_completion_time.png" alt="Task completion time mean and standard deviation across real-world trials." />
+        <figcaption>Task completion time (mean ± std, 50 real-world trials).</figcaption>
+      </figure>
+      <figure>
+        <img src="hardware_videos/Kinova_inference_latency.png" alt="Inference latency per control step showing mean and p95 for both methods." />
+        <figcaption>Inference latency per control step (mean and p95 across trials).</figcaption>
+      </figure>
+      <figure>
+        <img src="hardware_videos/Kinova_safety_clearance.png" alt="Minimum obstacle-surface clearance mean and standard deviation across real-world trials." />
+        <figcaption>Minimum obstacle-surface clearance (mean ± std safety margin).</figcaption>
+      </figure>
+    </div>
+    <p class="note">
+      Across the 50 trials summarized above, both methods complete the point-to-point obstacle-avoidance task successfully; Ours matches similar terminal accuracy and clearance while reducing mean per-step inference to the few-millisecond range versus the teacher (see table and plots).
+    </p>
 
     <div class="impl-details">
       <strong>Implementation details.</strong> Hardware evaluation uses 50 trials per method with
@@ -431,7 +409,7 @@
   <div class="container">
     <h2>BibTeX</h2>
 <pre><code>@article{anonymous2026fkd,
-  title   = {Factorized Koopman Distillation: Real-Time Robot Control from Diffusion Models},
+  title   = {Dynamic Neural Koopman Distillation for Fast Robot Control Using Diffusion Models},
   author  = {Anonymous},
   journal = {},
   year    = {2026},
