@@ -34,7 +34,7 @@
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      Diffusion models excel at generating diverse, multimodal trajectories and action sequences for robotic control, yet their iterative denoising process introduces latency that can constrain real-time closed-loop execution. To address this problem, we propose a Dynamic Neural Koopman (DNK) distillation framework, which distills multistep diffusion inference into a single forward pass conditioned on observations and sampled noise. Specifically, we introduce a Factorized Dynamic Koopman (FDK) layer that models the denoising process through a latent linear transition. The noisy trajectory input is lifted into a latent space, where the FDK layer parameterizes a factorized linear operator with condition-dependent eigenvalues that adapt the noisy-to-denoised transition to the current context. We evaluate DNK across robot-control benchmarks that span locomotion, state-based, and image-based manipulation, comparing against accelerated generative-policy baselines. The results demonstrate that one-step DNK outperforms accelerated generative-policy baselines in most evaluated settings while retaining teacher-comparable performance at millisecond-scale inference latency. On long-horizon manipulation tasks, DNK achieves competitive performance with substantially fewer inference parameters than the one-step policy baselines. Hardware experiments on a physical Kinova manipulator further demonstrate millisecond-scale inference and reduced task completion time.
+      Diffusion models excel at generating diverse, multimodal trajectories and action sequences for robotic control, yet their iterative denoising process introduces latency that can constrain real-time closed-loop execution. To address this problem, we propose a Dynamic Neural Koopman (DNK) distillation framework, which distills multistep diffusion inference into a single forward pass conditioned on observations and sampled noise. Specifically, we introduce a Factorized Dynamic Koopman (FDK) layer that models the denoising process through a latent linear transition. The noisy trajectory input is lifted into a latent space, where the FDK layer parameterizes a factorized linear operator with condition-dependent eigenvalues that adapt the noisy-to-denoised transition to the current context. We evaluate DNK across robot-control benchmarks that span locomotion, state-based, and image-based manipulation, comparing against accelerated generative-policy baselines. The results demonstrate that DNK achieves competitive or improved closed-loop performance relative to accelerated generative-policy baselines, while substantially reducing inference latency relative to the strongest high-performing one-step baselines. On long-horizon manipulation tasks, DNK achieves competitive performance with substantially fewer inference parameters than the one-step policy baselines. Hardware experiments on a physical Kinova manipulator further demonstrate millisecond-scale inference and reduced task completion time.
     </p> 
   </div>
 </section>
@@ -54,12 +54,12 @@
       teacher-consistent behavior in a Koopman latent space with dynamic
       transition refinement. Evaluation targets: normalized return, latency
       statistics, within-run variability
-      <span class="math">\(\sigma_{\mathrm{ep}}\)</span>, and worst-case return.
+      and closed-loop manipulation scores.
     </p>
     <div class="impl-details">
-      <strong>Implementation details.</strong> Evaluation protocol: 50 parallel
-      environments, 10 episodes per seed, 64 candidate actions, and D4RL
-      normalized return as the primary task metric.
+      <strong>Implementation details.</strong> Evaluation protocol: three matched
+      groups of 50 rollouts, locomotion IQL@64 candidates, and D4RL / task
+      scores as the primary metrics (see Simulation for details).
     </div>
   </div>
 </section>
@@ -68,7 +68,7 @@
   <div class="container">
     <h2>Overall framework</h2>
     <figure class="teaser">
-      <img src="diagram.png?v=20260920" alt="DNK framework: teacher diffusion policy and student Dynamic Neural Koopman Distillation" />
+      <img src="diagram.png?v=20260925" alt="DNK framework: teacher diffusion policy and student Dynamic Neural Koopman Distillation" />
       <figcaption>
         DNK distills diffusion-planner behavior into a dynamic neural Koopman
         student for one-step deployment while preserving trajectory diversity.
@@ -88,59 +88,113 @@
   <div class="container">
     <h2>Simulation environments</h2>
     <p>
-      We report results on <strong>Walker2d-medium-expert-v2</strong> and
-      <strong>HalfCheetah-medium-expert-v2</strong>.
+      We report results on D4RL locomotion
+      (<strong>Walker2d-medium-expert-v2</strong>,
+      <strong>HalfCheetah-medium-expert-v2</strong>),
+      <strong>Push-T</strong> (state and image), and long-horizon
+      <strong>Franka / Relay-Kitchen</strong> manipulation.
     </p>
     <h3>Experimental protocol</h3>
     <ul class="protocol-list">
-      <li><strong>Fixed seeds:</strong> all main and ablation statistics are aggregated over 5 random seeds (seed 0-4).</li>
-      <li><strong>Evaluator settings:</strong> 50 parallel vectorized environments, 10 episodes per seed, 1000-step episode cap, and 64 action candidates for candidate-based selectors.</li>
-      <li><strong>Normalization definition:</strong> returns are reported as D4RL normalized scores from the benchmark environment API and aggregated as mean ± std across seeds.</li>
-      <li><strong>Latency measurement:</strong> decision latency is measured per control step from policy decision start to selected action output; we report mean latency, p95 latency, and latency std (ms).</li>
-      <li><strong>Software/hardware:</strong> experiments are executed with the CleanDiffuser evaluation pipeline on Linux using GPU-enabled PyTorch inference and MuJoCo-backed D4RL simulation.</li>
+      <li><strong>Evaluation groups:</strong> each method is evaluated over three matched groups of 50 rollouts with identical initializations across methods.</li>
+      <li><strong>Locomotion:</strong> D4RL normalized return; 64 candidates with IQL@64 argmax; episode cap 1000 steps.</li>
+      <li><strong>Manipulation:</strong> Push-T coverage score / Franka Kitchen normalized completion; one candidate, execute 8 of 16 predicted actions.</li>
+      <li><strong>Latency:</strong> per-step policy decision time with CUDA synchronization (ms); we report mean ± std across evaluation groups.</li>
+      <li><strong>Model size:</strong> deployed inference parameters (M), including frozen visual encoders when used.</li>
     </ul>
     <div class="impl-details">
-      <strong>Implementation details.</strong> Offline control benchmarks are
-      evaluated in vectorized simulation with fixed protocol across methods:
-      5 random seeds, 50 parallel environments per seed, 10 episodes per seed,
-      horizon cap of 1000 steps, and 64 candidate trajectories/actions for
-      candidate-based selectors.
+      <strong>Implementation details.</strong> <em>T<sub>D</sub></em> / <em>T<sub>E</sub></em> denote task-specific DDPM / EDM teachers.
+      NFE is the number of sampling network evaluations per generated action chunk.
+      CT has no pretrained diffusion teacher.
     </div>
 
     <h3>Numerical results</h3>
+
+    <h4>D4RL locomotion</h4>
     <p>
-      Quantitative comparison results on D4RL locomotion tasks.
-      <em>T<sub>D</sub></em> and <em>T<sub>E</sub></em> denote task-specific
-      DDPM and EDM teachers, respectively. CT has no pretrained diffusion
-      teacher.
+      Quantitative results on HalfCheetah and Walker2d.
+      DNK retains near-teacher return at substantially lower latency than multistep teachers and one-step baselines such as OneDP-S / CP.
+    </p>
+    <div class="table-wrap">
+      <table class="results results-wide">
+        <thead>
+          <tr>
+            <th rowspan="2">Method</th><th rowspan="2">NFE</th>
+            <th colspan="2">HalfCheetah</th>
+            <th colspan="2">Walker2d</th>
+          </tr>
+          <tr>
+            <th>Score ↑</th><th>Latency (ms) ↓</th>
+            <th>Score ↑</th><th>Latency (ms) ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>20</td><td>0.867 ± 0.004</td><td>36.94 ± 0.63</td><td>1.109 ± 0.000</td><td>49.65 ± 0.12</td></tr>
+          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>18</td><td>0.842 ± 0.012</td><td>6.72 ± 0.02</td><td>1.108 ± 0.001</td><td>6.67 ± 0.01</td></tr>
+          <tr><td>CD</td><td>1</td><td>0.428 ± 0.013</td><td>1.08 ± 2.32</td><td>0.689 ± 0.010</td><td>1.09 ± 2.33</td></tr>
+          <tr><td>CT</td><td>1</td><td>0.403 ± 0.025</td><td>1.08 ± 2.31</td><td>0.387 ± 0.017</td><td>1.09 ± 2.37</td></tr>
+          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>1</td><td>0.676 ± 0.012</td><td>0.981 ± 0.01</td><td>1.059 ± 0.013</td><td>0.99 ± 0.01</td></tr>
+          <tr><td>OneDP-S (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.748 ± 0.030</td><td>2.03 ± 0.11</td><td>1.105 ± 0.000</td><td>2.03 ± 0.11</td></tr>
+          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.553 ± 0.024</td><td>0.34 ± 0.03</td><td>0.620 ± 0.011</td><td>0.35 ± 0.04</td></tr>
+          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.510 ± 0.004</td><td>0.86 ± 0.03</td><td>0.396 ± 0.066</td><td>0.87 ± 0.03</td></tr>
+          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>1</strong></td><td><strong>0.873 ± 0.007</strong></td><td><strong>0.68 ± 0.39</strong></td><td><strong>1.095 ± 0.001</strong></td><td><strong>0.60 ± 0.42</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Push-T (state and image)</h4>
+    <p>
+      Closed-loop Push-T scores. Image DNK includes a 2.56M action network and an 11.37M frozen visual encoder (13.93M total).
+    </p>
+    <div class="table-wrap">
+      <table class="results results-wide">
+        <thead>
+          <tr>
+            <th rowspan="2">Method</th><th rowspan="2">NFE</th>
+            <th colspan="3">Push-T State</th>
+            <th colspan="3">Push-T Image + proprioception</th>
+          </tr>
+          <tr>
+            <th>Score ↑</th><th>Latency (ms) ↓</th><th>Params (M) ↓</th>
+            <th>Score ↑</th><th>Latency (ms) ↓</th><th>Params (M) ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>5</td><td>0.937 ± 0.047</td><td>30.592 ± 0.077</td><td>68.88</td><td>0.845 ± 0.027</td><td>31.554 ± 0.073</td><td>80.39</td></tr>
+          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>158</td><td><strong>0.945 ± 0.021</strong></td><td>1802.309 ± 5.565</td><td>248.01</td><td><strong>0.913 ± 0.024</strong></td><td>1809.775 ± 4.711</td><td>262.71</td></tr>
+          <tr><td>CD</td><td>1</td><td>0.859 ± 0.007</td><td>3.162 ± 0.013</td><td>68.88</td><td>0.720 ± 0.013</td><td>4.768 ± 0.037</td><td>80.39</td></tr>
+          <tr><td>CT</td><td>1</td><td>0.887 ± 0.069</td><td>3.192 ± 0.041</td><td>68.88</td><td>0.820 ± 0.052</td><td>4.680 ± 0.055</td><td>80.39</td></tr>
+          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>1</td><td>0.927 ± 0.017</td><td>11.797 ± 0.061</td><td>251.68</td><td>0.815 ± 0.026</td><td>12.922 ± 0.027</td><td>266.38</td></tr>
+          <tr><td>OneDP-S (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.923 ± 0.021</td><td>6.162 ± 0.009</td><td>68.88</td><td>0.825 ± 0.013</td><td>7.053 ± 0.028</td><td>80.39</td></tr>
+          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.378 ± 0.049</td><td>0.618 ± 0.006</td><td>1.12</td><td>0.515 ± 0.056</td><td>1.347 ± 0.012</td><td>12.75</td></tr>
+          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.272 ± 0.012</td><td>0.903 ± 0.003</td><td>1.91</td><td>0.519 ± 0.074</td><td>1.530 ± 0.009</td><td>13.54</td></tr>
+          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>1</strong></td><td><strong>0.931 ± 0.037</strong></td><td><strong>1.283 ± 0.007</strong></td><td><strong>2.37</strong></td><td><strong>0.853 ± 0.041</strong></td><td><strong>1.780 ± 0.005</strong></td><td><strong>13.93</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Franka Kitchen</h4>
+    <p>
+      Long-horizon Franka Kitchen: DNK matches OneDP-S closely in score while using ~28× fewer parameters and ~4× lower latency.
     </p>
     <div class="table-wrap">
       <table class="results">
         <thead>
           <tr>
-            <th>Task</th><th>Method</th>
-            <th>Return ↑</th><th>Latency (ms) ↓</th>
+            <th>Method</th><th>NFE</th>
+            <th>Score ↑</th><th>Latency (ms) ↓</th><th>Params (M) ↓</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td rowspan="9"><strong>HalfCheetah</strong></td><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>0.867 ± 0.004</td><td>36.94 ± 0.63</td></tr>
-          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>0.842 ± 0.012</td><td>6.72 ± 0.02</td></tr>
-          <tr><td>CD (<em>T<sub>E</sub></em>)</td><td>0.428 ± 0.013</td><td>1.08 ± 2.32</td></tr>
-          <tr><td>CT</td><td>0.403 ± 0.025</td><td>1.08 ± 2.31</td></tr>
-          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>0.676 ± 0.012</td><td>2.03 ± 0.11</td></tr>
-          <tr><td>OneDP-S</td><td>0.748 ± 0.030</td><td>2.03 ± 0.11</td></tr>
-          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>0.553 ± 0.024</td><td>0.34 ± 0.03</td></tr>
-          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>0.510 ± 0.004</td><td>0.86 ± 0.03</td></tr>
-          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>0.873 ± 0.007</strong></td><td><strong>0.68 ± 0.39</strong></td></tr>
-          <tr><td rowspan="9"><strong>Walker2d</strong></td><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>1.109 ± 0.000</td><td>49.65 ± 0.12</td></tr>
-          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>1.108 ± 0.001</td><td>6.67 ± 0.01</td></tr>
-          <tr><td>CD (<em>T<sub>E</sub></em>)</td><td>0.689 ± 0.010</td><td>1.09 ± 2.33</td></tr>
-          <tr><td>CT</td><td>0.387 ± 0.017</td><td>1.09 ± 2.37</td></tr>
-          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>1.059 ± 0.013</td><td>1.11 ± 0.07</td></tr>
-          <tr><td>OneDP-S (<em>T<sub>D</sub></em>)</td><td>1.105 ± 0.000</td><td>2.03 ± 0.11</td></tr>
-          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>0.620 ± 0.011</td><td>0.35 ± 0.04</td></tr>
-          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>0.396 ± 0.066</td><td>0.87 ± 0.03</td></tr>
-          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>1.095 ± 0.001</strong></td><td><strong>0.60 ± 0.42</strong></td></tr>
+          <tr><td>DDPM Teacher (<em>T<sub>D</sub></em>)</td><td>50</td><td>0.985 ± 0.000</td><td>115.427 ± 0.809</td><td>68.92</td></tr>
+          <tr><td>EDM Teacher (<em>T<sub>E</sub></em>)</td><td>158</td><td>0.990 ± 0.010</td><td>681.062 ± 0.494</td><td>251.19</td></tr>
+          <tr><td>CD</td><td>1</td><td>0.440 ± 0.040</td><td>3.690 ± 0.067</td><td>68.92</td></tr>
+          <tr><td>CT</td><td>1</td><td>0.803 ± 0.028</td><td>3.640 ± 0.010</td><td>68.92</td></tr>
+          <tr><td>CP (<em>T<sub>E</sub></em>)</td><td>1</td><td>0.857 ± 0.035</td><td>12.026 ± 0.041</td><td>254.86</td></tr>
+          <tr><td>OneDP-S (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.975 ± 0.013</td><td>6.434 ± 0.045</td><td>68.92</td></tr>
+          <tr><td>KDM (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.462 ± 0.050</td><td>0.607 ± 0.008</td><td>1.78</td></tr>
+          <tr><td>KDM-F (<em>T<sub>D</sub></em>)</td><td>1</td><td>0.488 ± 0.031</td><td>0.818 ± 0.003</td><td>1.83</td></tr>
+          <tr class="ours"><td><strong>DNK (Ours)</strong> (<em>T<sub>D</sub></em>)</td><td><strong>1</strong></td><td><strong>0.973 ± 0.016</strong></td><td><strong>1.598 ± 0.004</strong></td><td><strong>2.46</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -177,6 +231,62 @@
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_consistency_policy.mp4" type="video/mp4" /></video><figcaption>CP</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdm_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM</figcaption></figure>
         <figure><video class="rollout-video" controls muted loop playsinline preload="metadata"><source src="assets/videos/halfcheetah_kdmf_static_fail_run1_1000.mp4" type="video/mp4" /></video><figcaption>KDM-F</figcaption></figure>
+      </div>
+    </div>
+
+    <h4>Push-T (state and image)</h4>
+    <p>
+      Closed-loop Push-T rollouts with our one-step DNK student
+      (state-based FDK and image-based VDV variants).
+    </p>
+    <div class="rollout-demo" data-speed="1">
+      <div class="rollout-controls">
+        <button type="button" class="btn sync-play">Play</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid">
+        <figure>
+          <video class="rollout-video" controls muted loop playsinline preload="metadata">
+            <source src="sim_videos/Push-T/pusht_state_ours_fdk_seed100000.mp4" type="video/mp4" />
+          </video>
+          <figcaption><strong>Ours</strong> — Push-T state (FDK)</figcaption>
+        </figure>
+        <figure>
+          <video class="rollout-video" controls muted loop playsinline preload="metadata">
+            <source src="sim_videos/Push-T/pusht_image_ours_vdv_seed100007.mp4" type="video/mp4" />
+          </video>
+          <figcaption><strong>Ours</strong> — Push-T image (VDV)</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <h4>Franka / Relay-Kitchen</h4>
+    <p>
+      Long-horizon kitchen manipulation: FDK student versus an identity-transition
+      control (no FDK) under the same seed and protocol.
+    </p>
+    <figure class="hardware-sequence-figure">
+      <img src="sim_videos/Franka/fdk_vs_identity_relay_kitchen.png" alt="Relay-Kitchen qualitative comparison: FDK versus identity transition." />
+      <figcaption>Qualitative comparison on Relay-Kitchen: FDK versus identity (no latent transition).</figcaption>
+    </figure>
+    <div class="rollout-demo" data-speed="1">
+      <div class="rollout-controls">
+        <button type="button" class="btn sync-play">Play</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid">
+        <figure>
+          <video class="rollout-video" controls muted loop playsinline preload="metadata">
+            <source src="sim_videos/Franka/fdk_relay_kitchen_seed100001.mp4" type="video/mp4" />
+          </video>
+          <figcaption><strong>Ours (FDK)</strong> — Relay-Kitchen</figcaption>
+        </figure>
+        <figure>
+          <video class="rollout-video" controls muted loop playsinline preload="metadata">
+            <source src="sim_videos/Franka/without_fdk_relay_kitchen_seed100001.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Without FDK (identity) — Relay-Kitchen</figcaption>
+        </figure>
       </div>
     </div>
 
@@ -244,27 +354,6 @@
       real-time speed; controls synchronize reset and start events.
     </div>
 
-    <h3>Ablation: number of refinement steps <span class="math">J</span></h3>
-    <p>
-      We vary <span class="math">J</span> in training and inference (5 seeds each).
-      <!-- <strong>Note:</strong> <span class="math">J=1</span> uses the main checkpoint;
-      <span class="math">J \in \{2,3,4\}</span> are separately re-trained students. -->
-    </p>
-    <div class="table-wrap">
-      <table class="results">
-        <thead><tr><th>Task</th><th>J</th><th>Return ↑</th><th>Latency (ms) ↓</th><th>σ<sub>ep</sub> ↓</th><th>Worst-case Return ↑</th></tr></thead>
-        <tbody>
-          <tr><td rowspan="4"><strong>Walker2d</strong></td><td>1</td><td>1.095 ± 0.001</td><td>0.60 ± 0.42</td><td>0.0005</td><td>1.0934</td></tr>
-          <tr><td>2</td><td>1.0951 ± 0.0001</td><td>3.03 ± 0.51</td><td>0.0003</td><td>1.0945</td></tr>
-          <tr><td>3</td><td>1.0977 ± 0.0002</td><td>3.24 ± 0.49</td><td>0.0004</td><td>1.0965</td></tr>
-          <tr class="ours"><td>4</td><td><strong>1.0995 ± 0.0001</strong></td><td>3.63 ± 0.41</td><td><strong>0.0002</strong></td><td><strong>1.0988</strong></td></tr>
-          <tr><td rowspan="4"><strong>HalfCheetah</strong></td><td>1</td><td>0.873 ± 0.007</td><td><strong>0.68 ± 0.39</strong></td><td>0.0134</td><td>0.8386</td></tr>
-          <tr><td>2</td><td>0.8767 ± 0.0027</td><td>0.94 ± 0.35</td><td>0.0127</td><td>0.8514</td></tr>
-          <tr><td>3</td><td>0.8178 ± 0.0012</td><td>1.10 ± 0.35</td><td>0.0180</td><td>0.7566</td></tr>
-          <tr class="ours"><td>4</td><td><strong>0.8774 ± 0.0015</strong></td><td>1.26 ± 0.35</td><td><strong>0.0117</strong></td><td><strong>0.8486</strong></td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 </section>
 
