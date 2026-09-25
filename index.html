@@ -38,32 +38,7 @@
   </div>
 </section>
 
-<section id="problem" class="section alt">
-  <div class="container">
-    <h2>Problem setting</h2>
-    <p>
-      We study real-time continuous-control policy distillation under offline
-      teacher supervision. The objective is to learn a one-step student policy
-      that preserves both return quality and trajectory-distribution structure
-      of a diffusion teacher while significantly reducing per-decision latency.
-    </p>
-    <p>
-      Let the teacher generate candidate trajectories and action selections
-      under the same state distribution. The student is optimized to reproduce
-      teacher-consistent behavior in a Koopman latent space with dynamic
-      transition refinement. Evaluation targets: normalized return, latency
-      statistics, within-run variability
-      and closed-loop manipulation scores.
-    </p>
-    <div class="impl-details">
-      <strong>Implementation details.</strong> The student is trained offline from
-      a frozen diffusion teacher and deployed with one network evaluation per
-      action chunk in a receding-horizon loop.
-    </div>
-  </div>
-</section>
-
-<section id="framework" class="section">
+<section id="framework" class="section alt">
   <div class="container">
     <h2>Overall framework</h2>
     <figure class="teaser">
@@ -83,7 +58,7 @@
   </div>
 </section>
 
-<section id="simulation" class="section alt">
+<section id="simulation" class="section">
   <div class="container">
     <h2>Simulation environments</h2>
     <p>
