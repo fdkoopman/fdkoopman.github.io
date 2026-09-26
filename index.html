@@ -75,7 +75,7 @@
       student architecture.
     </p>
     <div class="impl-details">
-      <strong>Evaluation protocol (matched to the paper).</strong>
+      <strong>Evaluation protocol.</strong>
       Each method is evaluated over <strong>three matched evaluation groups of
       50 rollouts</strong>, using identical environment initializations across
       methods. Locomotion uses 64 IQL-ranked candidates; latency is CUDA-synced
@@ -85,7 +85,7 @@
 
     <h3>Locomotion numerical results</h3>
     <p>
-      Quantitative comparison on D4RL locomotion (paper Table&nbsp;1).
+      Quantitative comparison on D4RL locomotion.
       <em>T<sub>D</sub></em> / <em>T<sub>E</sub></em> denote DDPM / EDM teachers.
     </p>
     <div class="table-wrap">
@@ -111,10 +111,10 @@
       </table>
     </div>
 
-    <h3>Manipulation highlights (paper tables)</h3>
+    <h3>Manipulation results</h3>
     <p>
-      Closed-loop scores / latency / parameters from the submission
-      (three matched groups of 50 episodes; mean&nbsp;±&nbsp;std).
+      Closed-loop score, latency, and parameter count
+      (three evaluation groups of 50 episodes; mean&nbsp;±&nbsp;std).
     </p>
     <div class="table-wrap">
       <table class="results">
@@ -398,14 +398,14 @@
     <h3>Still-frame comparison (Kinova Gen3)</h3>
     <figure class="hardware-sequence-figure">
       <img src="hardware_videos/Kinova_snapshots_sequence_comparasion_original.png" alt="Still frames from Kinova Gen3 hardware evaluation: diffusion teacher vs Ours." />
-      <figcaption>Representative rollout timelines from the hardware evaluation. The diffusion teacher reaches the goal near <em>t≈315</em>&nbsp;s after slow corrective motion near the obstacle (after the 100&nbsp;s success cutoff; 0% success under the paper protocol). Ours completes at <em>t≈85</em>&nbsp;s with faster replanning through the narrow passage (100% success).</figcaption>
+      <figcaption>Representative rollout timelines. The diffusion teacher reaches the goal near <em>t≈315</em>&nbsp;s (after the 100&nbsp;s success cutoff). Ours completes at <em>t≈85</em>&nbsp;s with faster replanning through the narrow passage.</figcaption>
     </figure>
 
     <h3>Deployment metrics (50 trials)</h3>
     <p class="note">Aggregates from the Kinova Gen3 hardware evaluation (same task and protocol as above).</p>
     <div class="grid-2 hardware-compare-grid">
       <figure>
-        <img src="hardware_videos/Kinova_success_rate.png?v=20260926" alt="Task success rate across 50 real-world trials: teacher 0%, Ours 100% under the 100 s / 5 mm protocol." />
+        <img src="hardware_videos/Kinova_success_rate.png?v=20260926" alt="Task success rate across 50 real-world trials: teacher 0%, Ours 100%." />
         <figcaption>Task success rate across 50 real-world trials (goal within 5&nbsp;mm and 100&nbsp;s, no collision): teacher 0.0%, Ours 100.0%.</figcaption>
       </figure>
       <figure>
@@ -422,9 +422,9 @@
       </figure>
     </div>
     <p class="note">
-      Under the paper success definition (5&nbsp;mm within 100&nbsp;s, no collision),
-      the teacher scores <strong>0%</strong> because mean completion is
-      ~315&nbsp;s, while Ours scores <strong>100%</strong> at ~85&nbsp;s.
+      Success requires reaching within 5&nbsp;mm of the goal within 100&nbsp;s
+      without collision. The teacher scores <strong>0%</strong> (mean completion
+      ~315&nbsp;s); Ours scores <strong>100%</strong> (~85&nbsp;s).
       Terminal error and clearance remain comparable; mean inference latency
       drops from 151.00&nbsp;ms to 4.08&nbsp;ms.
     </p>
