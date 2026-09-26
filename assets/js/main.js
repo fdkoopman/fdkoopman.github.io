@@ -22,10 +22,7 @@
     const teacherRate = clamp(1.0 / ratio, 0.0625, 1.0);
     const clipped = teacherRate !== 1.0 / ratio;
 
-    meta.textContent =
-      `${env}: teacher latency ${teacherMs.toFixed(2)} ms vs student latency ${studentMs.toFixed(2)} ms `
-      + `(${ratio.toFixed(1)}x slower). Replay rates: teacher ${teacherRate.toFixed(4)}x, student ${studentRate.toFixed(2)}x`
-      + (clipped ? " (teacher rate clipped by browser minimum)." : ".");
+    meta.textContent = "";
 
     function reset() {
       teacher.pause();
