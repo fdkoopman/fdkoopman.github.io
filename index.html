@@ -247,7 +247,7 @@
     </figure>
 
     <h3>Rollout videos</h3>
-    <p class="note">Kinova Gen3 hardware evaluation at 4× speed; paired clips support synchronized play and reset.</p>
+    <p class="note">Kinova Gen3 hardware evaluation; paired clips support synchronized play and reset.</p>
     <div class="video-grid hardware-video-grid">
       <figure>
         <video controls muted loop playsinline preload="metadata">
@@ -269,18 +269,16 @@
       </div>
       <div class="video-grid hardware-video-grid">
         <figure>
-          <span class="status-badge speedup">4x Speed</span>
           <video class="teacher-video" controls muted loop playsinline preload="metadata">
             <source src="hardware_videos/Kinova_teacher_real_world.mp4?v=20261006" type="video/mp4" />
           </video>
-          <figcaption>Diffusion Teacher (real-world side view, 4x replay).</figcaption>
+          <figcaption>Diffusion Teacher (real-world side view).</figcaption>
         </figure>
         <figure>
-          <span class="status-badge speedup">4x Speed</span>
           <video class="student-video" controls muted loop playsinline preload="metadata">
             <source src="hardware_videos/Kinova_student_real_world.mp4?v=20261006" type="video/mp4" />
           </video>
-          <figcaption><strong>Ours</strong> (real-world side view, 4x replay).</figcaption>
+          <figcaption><strong>Ours</strong> (real-world side view).</figcaption>
         </figure>
       </div>
     </div>
@@ -294,18 +292,16 @@
       </div>
       <div class="video-grid hardware-video-grid">
         <figure>
-          <span class="status-badge speedup">4x Speed</span>
           <video class="teacher-video" controls muted loop playsinline preload="metadata">
             <source src="hardware_videos/Kinova_front_teacher_real_world.mp4?v=20261006" type="video/mp4" />
           </video>
-          <figcaption>Diffusion Teacher (real-world front view, 4x replay).</figcaption>
+          <figcaption>Diffusion Teacher (real-world front view).</figcaption>
         </figure>
         <figure>
-          <span class="status-badge speedup">4x Speed</span>
           <video class="student-video" controls muted loop playsinline preload="metadata">
             <source src="hardware_videos/Kinova_front_student_real_world.mp4?v=20261006" type="video/mp4" />
           </video>
-          <figcaption><strong>Ours</strong> (real-world front view, 4x replay).</figcaption>
+          <figcaption><strong>Ours</strong> (real-world front view).</figcaption>
         </figure>
       </div>
     </div>
@@ -347,8 +343,8 @@
       <strong>Implementation details.</strong> Hardware evaluation uses 50 trials per method with
       80&nbsp;Hz Cartesian position commands, 30-step teacher denoising, horizon 32, and 64 ranked candidates.
       At most one planning request is in flight; only the first action of the top-scoring candidate updates the next command.
-      Simulation rollouts use the no-physics Kinova task setting; real-world clips replay at 4× speed
-      with synchronized play/reset for side and front views.
+      Simulation rollouts use the no-physics Kinova task setting, with synchronized play/reset
+      for side and front views.
     </div>
   </div>
 </section>
