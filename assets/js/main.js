@@ -78,15 +78,19 @@
     const speed = Number(root.dataset.speed || "2");
     if (!teacher || !student || !playBtn || !resetBtn) return;
 
+    function applyRate() {
+      teacher.playbackRate = speed;
+      student.playbackRate = speed;
+      teacher.defaultPlaybackRate = speed;
+      student.defaultPlaybackRate = speed;
+    }
+
     function reset() {
       teacher.pause();
       student.pause();
       teacher.currentTime = 0;
       student.currentTime = 0;
-      teacher.playbackRate = speed;
-      student.playbackRate = speed;
-      teacher.defaultPlaybackRate = speed;
-      student.defaultPlaybackRate = speed;
+      applyRate();
     }
 
     async function syncPlay() {
@@ -94,10 +98,7 @@
       student.pause();
       teacher.currentTime = 0;
       student.currentTime = 0;
-      teacher.playbackRate = speed;
-      student.playbackRate = speed;
-      teacher.defaultPlaybackRate = speed;
-      student.defaultPlaybackRate = speed;
+      applyRate();
       try {
         await teacher.play();
       } catch (_) {
@@ -110,6 +111,10 @@
       }
     }
 
+    [teacher, student].forEach((video) => {
+      video.addEventListener("loadedmetadata", applyRate);
+      video.addEventListener("play", applyRate);
+    });
     playBtn.addEventListener("click", syncPlay);
     resetBtn.addEventListener("click", reset);
     reset();
