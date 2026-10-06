@@ -242,19 +242,25 @@
 
     <h3>Rollout videos</h3>
     <p class="note">Kinova Gen3 hardware evaluation; paired clips support synchronized play and reset.</p>
-    <div class="video-grid hardware-video-grid">
-      <figure>
-        <video controls muted loop playsinline preload="metadata">
-          <source src="sim_videos/sim_teacher_diffusion.mp4" type="video/mp4" />
-        </video>
-        <figcaption>Diffusion Teacher (simulation).</figcaption>
-      </figure>
-      <figure>
-        <video controls muted loop playsinline preload="metadata">
-          <source src="sim_videos/sim_student_koopman.mp4" type="video/mp4" />
-        </video>
-        <figcaption><strong>Ours</strong> (simulation).</figcaption>
-      </figure>
+    <div class="sync-demo" data-speed="1">
+      <div class="latency-controls">
+        <button type="button" class="btn sync-play">Play synchronized replay</button>
+        <button type="button" class="btn reset-playback">Reset</button>
+      </div>
+      <div class="video-grid hardware-video-grid">
+        <figure>
+          <video class="teacher-video" controls muted loop playsinline preload="metadata">
+            <source src="sim_videos/sim_teacher_diffusion.mp4" type="video/mp4" />
+          </video>
+          <figcaption>Diffusion Teacher (simulation).</figcaption>
+        </figure>
+        <figure>
+          <video class="student-video" controls muted loop playsinline preload="metadata">
+            <source src="sim_videos/sim_student_koopman.mp4" type="video/mp4" />
+          </video>
+          <figcaption><strong>Ours</strong> (simulation).</figcaption>
+        </figure>
+      </div>
     </div>
     <div class="sync-demo" data-speed="1">
       <div class="latency-controls">
