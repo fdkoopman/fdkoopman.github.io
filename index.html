@@ -235,9 +235,9 @@
       On the physical Kinova Gen3, we compare the diffusion teacher and our
       one-step distilled policy under the same task specification, asynchronous
       replanning pipeline, and low-level controller (50 trials per method).
-      Success requires reaching within <strong>5&nbsp;mm</strong> of the goal
-      within <strong>100&nbsp;s</strong> without end-effector–obstacle collision;
-      trials may continue past 100&nbsp;s only to measure full completion time.
+      The goal tolerance is <strong>5&nbsp;mm</strong> without end-effector–obstacle
+      collision; we report completion time, inference latency, and clearance
+      (no deadline-based success rate).
     </p>
 
     <h3>Rollout videos</h3>
@@ -308,16 +308,12 @@
     <h3>Still-frame comparison (Kinova Gen3)</h3>
     <figure class="hardware-sequence-figure">
       <img src="hardware_videos/Kinova_snapshots_sequence_comparasion_original.png" alt="Still frames from Kinova Gen3 hardware evaluation: diffusion teacher vs Ours." />
-      <figcaption>Representative rollout timelines. The diffusion teacher reaches the goal near <em>t≈315</em>&nbsp;s (after the 100&nbsp;s success cutoff). Ours completes at <em>t≈85</em>&nbsp;s with faster replanning through the narrow passage.</figcaption>
+      <figcaption>Representative rollout timelines. The diffusion teacher reaches the goal near <em>t≈315</em>&nbsp;s. Ours completes at <em>t≈85</em>&nbsp;s with faster replanning through the narrow passage.</figcaption>
     </figure>
 
     <h3>Deployment metrics (50 trials)</h3>
-    <p class="note">Aggregates from the Kinova Gen3 hardware evaluation (same task and protocol as above).</p>
+    <p class="note">Aggregates from the Kinova Gen3 hardware evaluation (same task and protocol as above). Deadline-based success rate is not reported.</p>
     <div class="grid-2 hardware-compare-grid">
-      <figure>
-        <img src="hardware_videos/Kinova_success_rate.png?v=20260926" alt="Task success rate across 50 real-world trials: teacher 0%, Ours 100%." />
-        <figcaption>Task success rate across 50 real-world trials (goal within 5&nbsp;mm and 100&nbsp;s, no collision): teacher 0.0%, Ours 100.0%.</figcaption>
-      </figure>
       <figure>
         <img src="hardware_videos/Kinova_completion_time.png" alt="Task completion time mean and standard deviation across real-world trials." />
         <figcaption>Task completion time (mean ± std, 50 real-world trials).</figcaption>
@@ -332,9 +328,7 @@
       </figure>
     </div>
     <p class="note">
-      Success requires reaching within 5&nbsp;mm of the goal within 100&nbsp;s
-      without collision. The teacher scores <strong>0%</strong> (mean completion
-      ~315&nbsp;s); Ours scores <strong>100%</strong> (~85&nbsp;s).
+      Mean completion time is ~315&nbsp;s for the teacher and ~85&nbsp;s for Ours.
       Terminal error and clearance remain comparable; mean inference latency
       drops from 151.00&nbsp;ms to 4.08&nbsp;ms.
     </p>
